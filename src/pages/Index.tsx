@@ -1,4 +1,4 @@
-import { Bottles, DollarSign, Package, ShoppingCart } from "lucide-react";
+import { Wine, DollarSign, Package, ShoppingCart } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { InventoryTable } from "@/components/InventoryTable";
 import { QuickAddForm } from "@/components/QuickAddForm";
@@ -23,7 +23,7 @@ const Index = () => {
           <StatsCard title="Total Items" value="156" icon={<Package />} />
           <StatsCard title="Low Stock Items" value="8" icon={<ShoppingCart />} />
           <StatsCard title="Value in Stock" value="$24,590" icon={<DollarSign />} />
-          <StatsCard title="Items Sold Today" value="47" icon={<Bottles />} />
+          <StatsCard title="Items Sold Today" value="47" icon={<Wine />} />
         </div>
 
         <QuickAddForm />
