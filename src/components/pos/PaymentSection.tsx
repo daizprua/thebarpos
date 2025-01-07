@@ -34,11 +34,16 @@ export function PaymentSection({
     ? parseFloat(cashReceived) - totalAmount
     : 0;
 
+  // Calculate convenient payment amounts
+  const nextWholeNumber = Math.ceil(totalAmount);
+  const nextTen = Math.ceil(totalAmount / 10) * 10;
+  const nextHigherTen = nextTen + 10;
+
   const quickPaymentAmounts = [
     totalAmount,
-    totalAmount + 5,
-    totalAmount + 10,
-    totalAmount + 20
+    nextWholeNumber,
+    nextTen,
+    nextHigherTen
   ];
   
   const handleQuickPayment = (amount: number) => {
