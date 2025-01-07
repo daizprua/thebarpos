@@ -3,8 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Product } from "@/types/pos";
-import { Link } from "react-router-dom";
-import { Package, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState } from "react";
 
 interface ProductsSectionProps {
@@ -23,12 +22,6 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
     <div className="flex-1">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold text-white">Products</h2>
-        <Button variant="secondary" asChild>
-          <Link to="/">
-            <Package className="mr-2 h-4 w-4" />
-            Manage Inventory
-          </Link>
-        </Button>
       </div>
 
       <div className="relative mb-4">
