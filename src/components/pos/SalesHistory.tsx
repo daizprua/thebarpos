@@ -23,6 +23,23 @@ import { isAdmin } from "@/lib/auth";
 
 type TimeRange = "day" | "week" | "month";
 
+const formatPaymentMethod = (method: string | undefined): string => {
+  if (!method) return 'Unknown';
+  
+  switch (method.toLowerCase().trim()) {
+    case 'efectivo':
+    case 'cash':
+      return 'Cash';
+    case 'tarjeta':
+    case 'card':
+      return 'Card';
+    case 'yappy':
+      return 'Yappy';
+    default:
+      return method;
+  }
+};
+
 export function SalesHistory() {
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
   const [sales, setSales] = useState<Sale[]>([]);
@@ -88,6 +105,7 @@ export function SalesHistory() {
             <TableRow>
               <TableHead>Date</TableHead>
               <TableHead>Items</TableHead>
+              <TableHead>Payment Method</TableHead>
               <TableHead className="text-right">Total</TableHead>
               {userIsAdmin && <TableHead className="w-[100px]">Actions</TableHead>}
             </TableRow>
@@ -95,7 +113,7 @@ export function SalesHistory() {
           <TableBody>
             {filteredSales.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={userIsAdmin ? 4 : 3} className="text-center">No sales found</TableCell>
+                <TableCell colSpan={userIsAdmin ? 5 : 4} className="text-center">No sales found</TableCell>
               </TableRow>
             ) : (
               filteredSales.map((sale) => (
@@ -110,6 +128,7 @@ export function SalesHistory() {
                       ))}
                     </ul>
                   </TableCell>
+                  <TableCell>{formatPaymentMethod(sale.paymentMethod)}</TableCell>
                   <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
                   {userIsAdmin && (
                     <TableCell>
