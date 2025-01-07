@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ImagePlus, Save } from "lucide-react";
+import { ImagePlus, Save, Pencil } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Article {
@@ -17,6 +17,7 @@ export const ArticleManager = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("https://images.unsplash.com/photo-1649972904349-6e44c42644a7");
+  const [editingId, setEditingId] = useState<number | null>(null);
   const { toast } = useToast();
 
   const handleSave = () => {
@@ -29,28 +30,53 @@ export const ArticleManager = () => {
       return;
     }
 
-    const newArticle: Article = {
-      id: articles.length + 1,
-      title,
-      content,
-      imageUrl,
-    };
+    if (editingId) {
+      // Update existing article
+      setArticles(articles.map(article => 
+        article.id === editingId 
+          ? { ...article, title, content, imageUrl }
+          : article
+      ));
+      setEditingId(null);
+      toast({
+        title: "Success",
+        description: "Article updated successfully",
+      });
+    } else {
+      // Create new article
+      const newArticle: Article = {
+        id: articles.length + 1,
+        title,
+        content,
+        imageUrl,
+      };
+      setArticles([...articles, newArticle]);
+      toast({
+        title: "Success",
+        description: "Article saved successfully",
+      });
+    }
 
-    setArticles([...articles, newArticle]);
+    // Reset form
     setTitle("");
     setContent("");
     setImageUrl("https://images.unsplash.com/photo-1649972904349-6e44c42644a7");
+  };
 
-    toast({
-      title: "Success",
-      description: "Article saved successfully",
-    });
+  const handleEdit = (article: Article) => {
+    setTitle(article.title);
+    setContent(article.content);
+    setImageUrl(article.imageUrl);
+    setEditingId(article.id);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="space-y-6">
       <div className="rounded-lg border bg-card backdrop-blur-lg p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-white">Create New Article</h3>
+        <h3 className="text-lg font-semibold text-white">
+          {editingId ? "Edit Article" : "Create New Article"}
+        </h3>
         <div className="space-y-4">
           <Input
             placeholder="Article Title"
@@ -79,8 +105,6 @@ export const ArticleManager = () => {
               className="hidden"
               onChange={(e) => {
                 if (e.target.files?.[0]) {
-                  // In a real application, you would upload the file to a server
-                  // For now, we'll just use the placeholder image
                   toast({
                     title: "Image Upload Simulated",
                     description: "In a real app, this would upload to a server",
@@ -90,8 +114,21 @@ export const ArticleManager = () => {
             />
             <Button onClick={handleSave}>
               <Save className="mr-2" />
-              Save Article
+              {editingId ? "Update Article" : "Save Article"}
             </Button>
+            {editingId && (
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setEditingId(null);
+                  setTitle("");
+                  setContent("");
+                  setImageUrl("https://images.unsplash.com/photo-1649972904349-6e44c42644a7");
+                }}
+              >
+                Cancel Edit
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -111,7 +148,15 @@ export const ArticleManager = () => {
               />
               <div className="p-4">
                 <h4 className="text-lg font-semibold text-white mb-2">{article.title}</h4>
-                <p className="text-gray-300 line-clamp-3">{article.content}</p>
+                <p className="text-gray-300 line-clamp-3 mb-4">{article.content}</p>
+                <Button 
+                  variant="secondary" 
+                  size="sm" 
+                  onClick={() => handleEdit(article)}
+                >
+                  <Pencil className="mr-2 h-4 w-4" />
+                  Edit
+                </Button>
               </div>
             </div>
           ))}
