@@ -15,19 +15,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import { Sale } from "@/types/pos";
+import { isAdmin } from "@/lib/auth";
 
 type TimeRange = "day" | "week" | "month";
 
 export function SalesHistory() {
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
   const [sales, setSales] = useState<Sale[]>([]);
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const userIsAdmin = isAdmin(user);
 
   useEffect(() => {
     // Load sales from localStorage
     const savedSales = JSON.parse(localStorage.getItem('sales') || '[]');
     setSales(savedSales);
   }, []);
+
+  const handleDeleteSale = (saleId: number) => {
+    const updatedSales = sales.filter(sale => sale.id !== saleId);
+    setSales(updatedSales);
+    localStorage.setItem('sales', JSON.stringify(updatedSales));
+    toast.success('Sale deleted successfully');
+  };
 
   const filterSales = (sales: Sale[], range: TimeRange) => {
     const now = new Date();
@@ -75,12 +89,13 @@ export function SalesHistory() {
               <TableHead>Date</TableHead>
               <TableHead>Items</TableHead>
               <TableHead className="text-right">Total</TableHead>
+              {userIsAdmin && <TableHead className="w-[100px]">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredSales.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center">No sales found</TableCell>
+                <TableCell colSpan={userIsAdmin ? 4 : 3} className="text-center">No sales found</TableCell>
               </TableRow>
             ) : (
               filteredSales.map((sale) => (
@@ -96,6 +111,18 @@ export function SalesHistory() {
                     </ul>
                   </TableCell>
                   <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
+                  {userIsAdmin && (
+                    <TableCell>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteSale(sale.id)}
+                        className="hover:bg-destructive hover:text-destructive-foreground"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}
