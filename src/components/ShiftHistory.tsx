@@ -17,6 +17,16 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
+const formatPaymentMethod = (method: string): string => {
+  const methodMap: { [key: string]: string } = {
+    'efectivo': 'Cash',
+    'tarjeta': 'Card',
+    'yappy': 'Yappy',
+    'unknown': 'Unknown'
+  };
+  return methodMap[method.toLowerCase()] || method;
+};
+
 export function ShiftHistory() {
   const [shifts, setShifts] = useState<Shift[]>(() => {
     try {
@@ -53,7 +63,7 @@ export function ShiftHistory() {
 
   const calculatePaymentBreakdown = (sales: Sale[]) => {
     return sales.reduce((acc: { [key: string]: number }, sale) => {
-      const method = sale.paymentMethod || 'unknown';
+      const method = formatPaymentMethod(sale.paymentMethod || 'unknown');
       acc[method] = (acc[method] || 0) + sale.total;
       return acc;
     }, {});
@@ -154,7 +164,7 @@ export function ShiftHistory() {
                         <TableBody>
                           {Object.entries(paymentBreakdown).map(([method, amount]) => (
                             <TableRow key={method}>
-                              <TableCell className="capitalize">{method}</TableCell>
+                              <TableCell>{method}</TableCell>
                               <TableCell className="text-right">${amount.toFixed(2)}</TableCell>
                             </TableRow>
                           ))}
