@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SaveSaleDialog } from "./SaveSaleDialog";
 import { CartItem, SavedSale } from "@/types/pos";
+import { Save } from "lucide-react";
 
 interface PaymentSectionProps {
   totalAmount: number;
@@ -36,6 +37,12 @@ export function PaymentSection({
     totalAmount + 10,      // $10 more
     totalAmount + 20,      // $20 more
   ];
+
+  const handleQuickUpdate = () => {
+    if (currentSavedSale) {
+      onSaveSale(currentSavedSale.clientName);
+    }
+  };
 
   return (
     <div className="mt-4 pt-4 border-t border-gray-700">
@@ -117,12 +124,25 @@ export function PaymentSection({
         </Button>
         
         {cart.length > 0 && (
-          <SaveSaleDialog
-            cart={cart}
-            total={totalAmount}
-            onSave={onSaveSale}
-            currentSavedSale={currentSavedSale}
-          />
+          <div className="flex gap-2">
+            {currentSavedSale ? (
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={handleQuickUpdate}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                Update Sale
+              </Button>
+            ) : (
+              <SaveSaleDialog
+                cart={cart}
+                total={totalAmount}
+                onSave={onSaveSale}
+                currentSavedSale={currentSavedSale}
+              />
+            )}
+          </div>
         )}
       </div>
     </div>
