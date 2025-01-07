@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ProductsSection } from "@/components/pos/ProductsSection";
 import { CartSection } from "@/components/pos/CartSection";
 import { ShiftControls } from "@/components/pos/ShiftControls";
-import { Product, CartItem, SavedSale } from "@/types/pos";
+import { Product, CartItem, SavedSale, Shift } from "@/types/pos";
 
 const Pos = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
