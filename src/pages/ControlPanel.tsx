@@ -3,7 +3,7 @@ import { isAdmin } from "@/lib/auth";
 import { UserManagementCard } from "@/components/control-panel/UserManagementCard";
 import { LimitedAccessCard } from "@/components/control-panel/LimitedAccessCard";
 import { MenuOrderCard } from "@/components/control-panel/MenuOrderCard";
-import { ColorCustomizationCard } from "@/components/control-panel/ColorCustomizationCard";
+import { ColorPaletteSelector } from "@/components/control-panel/ColorPaletteSelector";
 
 const ControlPanel = () => {
   const userStr = localStorage.getItem('user');
@@ -20,7 +20,7 @@ const ControlPanel = () => {
           <div className="grid gap-6">
             <UserManagementCard />
             <MenuOrderCard />
-            <ColorCustomizationCard />
+            <ColorPaletteSelector />
           </div>
         ) : (
           <LimitedAccessCard />
