@@ -23,9 +23,14 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
   const [initialCash, setInitialCash] = useState("");
   const [showHistory, setShowHistory] = useState(false);
   const { toast } = useToast();
-  const [shifts, setShifts] = useState<Shift[]>(() => 
-    JSON.parse(localStorage.getItem('shifts') || '[]')
-  );
+  const [shifts, setShifts] = useState<Shift[]>(() => {
+    try {
+      const savedShifts = JSON.parse(localStorage.getItem('shifts') || '[]');
+      return Array.isArray(savedShifts) ? savedShifts : [];
+    } catch {
+      return [];
+    }
+  });
 
   const handleStartShift = () => {
     const amount = parseFloat(initialCash);
@@ -124,15 +129,15 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <p className="text-muted-foreground">Initial Cash</p>
-                    <p className="font-medium">${shift.initialCash.toFixed(2)}</p>
+                    <p className="font-medium">${(shift.initialCash || 0).toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Total Sales</p>
-                    <p className="font-medium">${shift.totalSales.toFixed(2)}</p>
+                    <p className="font-medium">${(shift.totalSales || 0).toFixed(2)}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Transactions</p>
-                    <p className="font-medium">{shift.numberOfTransactions}</p>
+                    <p className="font-medium">{shift.numberOfTransactions || 0}</p>
                   </div>
                 </div>
               </div>
