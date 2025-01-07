@@ -5,6 +5,7 @@ import { CartSection } from "./CartSection";
 import { ShiftControls } from "./ShiftControls";
 import { SavedSalesTab } from "./SavedSalesTab";
 import { Product, CartItem, SavedSale, Shift } from "@/types/pos";
+import { handleCheckout as createCheckoutHandler } from "./CheckoutManager";
 
 export function PosContainer() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -169,50 +170,16 @@ export function PosContainer() {
     }
   };
 
-  const handleCheckout = (paymentMethod: string) => {
-    if (!activeShift) {
-      toast({
-        variant: "destructive",
-        title: "No Active Shift",
-        description: "Please start your shift before making sales.",
-      });
-      return;
-    }
-
-    if (cart.length === 0) {
-      toast({
-        description: "Cart is empty",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const newSale = {
-      id: Date.now(),
-      items: cart,
-      total: getTotalAmount(),
-      date: new Date().toISOString(),
-      shiftId: activeShift.id,
-      paymentMethod: paymentMethod // Add payment method to the sale
-    };
-
-    const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
-    localStorage.setItem('sales', JSON.stringify([...existingSales, newSale]));
-
-    // If this was a saved sale, remove it from saved sales
-    if (currentSavedSaleId) {
-      const updatedSavedSales = savedSales.filter(sale => sale.id !== currentSavedSaleId);
-      localStorage.setItem('savedSales', JSON.stringify(updatedSavedSales));
-      setSavedSales(updatedSavedSales);
-      setCurrentSavedSaleId(null);
-    }
-
-    toast({
-      title: "Order Completed",
-      description: `Total Amount: $${getTotalAmount().toFixed(2)}`,
-    });
-    setCart([]);
-  };
+  const handleCheckout = createCheckoutHandler({
+    cart,
+    getTotalAmount,
+    activeShift,
+    currentSavedSaleId,
+    savedSales,
+    setSavedSales,
+    setCurrentSavedSaleId,
+    setCart,
+  });
 
   return (
     <div className="min-h-screen bg-[#1A1F2C]">
