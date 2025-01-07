@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ProfessionalMenu } from "@/components/ProfessionalMenu";
+import Login from "./pages/Login";
 import Index from "./pages/Index";
 import Pos from "./pages/Pos";
 import Statistics from "./pages/Statistics";
@@ -16,7 +17,10 @@ const App = () => {
   const user = userStr ? JSON.parse(userStr) : null;
 
   const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-    if (user?.role === 'cajero') {
+    if (!user) {
+      return <Navigate to="/" />;
+    }
+    if (user.role === 'cajero') {
       return <Navigate to="/pos" />;
     }
     return <>{children}</>;
@@ -28,10 +32,12 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <ProfessionalMenu />
+          {user && <ProfessionalMenu />}
           <Routes>
-            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-            <Route path="/pos" element={<Pos />} />
+            <Route path="/" element={user ? (
+              user.role === 'admin' ? <Navigate to="/inventory" /> : <Navigate to="/pos" />
+            ) : <Login />} />
+            <Route path="/pos" element={user ? <Pos /> : <Navigate to="/" />} />
             <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
             <Route path="/inventory" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/control-panel" element={<ProtectedRoute><ControlPanel /></ProtectedRoute>} />
