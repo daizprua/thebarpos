@@ -44,11 +44,18 @@ export function ProfessionalMenu() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
-            {activeShift && (
-              <span className="text-sm text-muted-foreground">
-                Shift started by: {activeShift.startedBy}
-              </span>
-            )}
+            <div className="flex items-center gap-4">
+              {user && (
+                <span className="text-sm text-muted-foreground">
+                  User: {user.username}
+                </span>
+              )}
+              {activeShift && (
+                <span className="text-sm text-muted-foreground">
+                  Shift started by: {activeShift.startedBy}
+                </span>
+              )}
+            </div>
             {menuOrder.map((menuItem: string) => {
               switch(menuItem) {
                 case 'home':
