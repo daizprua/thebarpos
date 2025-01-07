@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { Shift, Sale, Expense } from "@/types/pos";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { ChevronDown } from "lucide-react";
 import {
@@ -16,6 +8,9 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { ShiftPaymentBreakdown } from "./shifts/ShiftPaymentBreakdown";
+import { ShiftExpenses } from "./shifts/ShiftExpenses";
+import { ShiftSummary } from "./shifts/ShiftSummary";
 
 export function ShiftHistory() {
   const [shifts, setShifts] = useState<Shift[]>(() => {
@@ -81,12 +76,6 @@ export function ShiftHistory() {
     }
   };
 
-  const paymentMethodNames: { [key: string]: string } = {
-    efectivo: "Cash",
-    tarjeta: "Card",
-    yappy: "Yappy"
-  };
-
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold mb-6">Shift History</h1>
@@ -95,17 +84,6 @@ export function ShiftHistory() {
           const shiftSales = getShiftSales(shift.id);
           const shiftExpenses = getShiftExpenses(shift.id);
           const totalSales = shiftSales.reduce((sum, sale) => sum + sale.total, 0);
-          const totalExpenses = shiftExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-
-          // Group sales by payment method
-          const salesByPaymentMethod = shiftSales.reduce((acc: { [key: string]: number }, sale) => {
-            console.log('Sale payment method:', sale.paymentMethod); // Debug log
-            const method = sale.paymentMethod;
-            if (method) {
-              acc[method] = (acc[method] || 0) + sale.total;
-            }
-            return acc;
-          }, {});
 
           return (
             <Collapsible key={shift.id}>
@@ -134,66 +112,15 @@ export function ShiftHistory() {
 
                 <CollapsibleContent className="pt-4">
                   <div className="space-y-4">
-                    <div className="grid grid-cols-3 gap-4">
-                      <div>
-                        <p className="text-sm font-medium">Initial Cash</p>
-                        <p className="text-2xl font-bold">${shift.initialCash.toFixed(2)}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Total Sales</p>
-                        <p className="text-2xl font-bold text-green-500">${totalSales.toFixed(2)}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Total Expenses</p>
-                        <p className="text-2xl font-bold text-red-500">${totalExpenses.toFixed(2)}</p>
-                      </div>
-                    </div>
+                    <ShiftSummary
+                      initialCash={shift.initialCash}
+                      sales={shiftSales}
+                      expenses={shiftExpenses}
+                    />
 
-                    <div className="space-y-4">
-                      <h4 className="font-medium">Sales by Payment Method</h4>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Payment Method</TableHead>
-                            <TableHead className="text-right">Amount</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {Object.entries(salesByPaymentMethod).map(([method, amount]) => (
-                            <TableRow key={method}>
-                              <TableCell>{paymentMethodNames[method] || method}</TableCell>
-                              <TableCell className="text-right">
-                                ${amount.toFixed(2)}
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-
-                    {shiftExpenses.length > 0 && (
-                      <div className="space-y-4">
-                        <h4 className="font-medium">Expenses</h4>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Description</TableHead>
-                              <TableHead className="text-right">Amount</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {shiftExpenses.map((expense) => (
-                              <TableRow key={expense.id}>
-                                <TableCell>{expense.description}</TableCell>
-                                <TableCell className="text-right text-red-500">
-                                  ${expense.amount.toFixed(2)}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    )}
+                    <ShiftPaymentBreakdown sales={shiftSales} />
+                    
+                    <ShiftExpenses expenses={shiftExpenses} />
                     
                     {user?.role === 'admin' && shift.endTime && (
                       <div className="flex justify-end">
