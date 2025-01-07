@@ -14,6 +14,12 @@ interface ShiftSummaryProps {
 }
 
 export function ShiftSummary({ summary }: ShiftSummaryProps) {
+  const paymentMethodNames = {
+    efectivo: "Cash",
+    tarjeta: "Card",
+    yappy: "Yappy"
+  };
+
   return (
     <div className="space-y-6">
       <Card className="p-6">
@@ -48,7 +54,9 @@ export function ShiftSummary({ summary }: ShiftSummaryProps) {
           <TableBody>
             {Object.entries(summary.paymentBreakdown).map(([method, amount]) => (
               <TableRow key={method}>
-                <TableCell className="capitalize">{method}</TableCell>
+                <TableCell className="capitalize">
+                  {paymentMethodNames[method as keyof typeof paymentMethodNames] || method}
+                </TableCell>
                 <TableCell className="text-right">${amount.toFixed(2)}</TableCell>
               </TableRow>
             ))}

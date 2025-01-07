@@ -30,9 +30,21 @@ export function PaymentSection({
   currentSavedSale,
   isAdmin,
 }: PaymentSectionProps) {
-  const change = cashReceived
-    ? parseFloat(cashReceived) - totalAmount
-    : 0;
+  const change = cashReceived ? parseFloat(cashReceived) - totalAmount : 0;
+
+  // Calculate quick payment options
+  const getQuickPaymentOptions = () => {
+    const roundedUp = Math.ceil(totalAmount);
+    const nextTen = Math.ceil(totalAmount / 10) * 10;
+    const nextHigherTen = nextTen === Math.ceil(totalAmount / 10) * 10 ? nextTen + 10 : nextTen;
+
+    return [
+      totalAmount,
+      roundedUp,
+      nextTen,
+      nextHigherTen
+    ];
+  };
 
   return (
     <div className="mt-6 space-y-4">
@@ -68,6 +80,18 @@ export function PaymentSection({
 
         {paymentMethod === "efectivo" && (
           <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
+              {getQuickPaymentOptions().map((amount, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  onClick={() => setCashReceived(amount.toFixed(2))}
+                  className="w-full"
+                >
+                  ${amount.toFixed(2)}
+                </Button>
+              ))}
+            </div>
             <Input
               type="number"
               placeholder="Cash received"
