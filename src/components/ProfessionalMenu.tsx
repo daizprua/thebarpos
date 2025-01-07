@@ -52,7 +52,7 @@ export function ProfessionalMenu() {
               )}
               {activeShift && (
                 <span className="text-sm text-muted-foreground">
-                  Shift started by: {activeShift.startedBy}
+                  {activeShift.startedBy}
                 </span>
               )}
             </div>
