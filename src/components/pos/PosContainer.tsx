@@ -21,6 +21,11 @@ export function PosContainer() {
   
   const { toast } = useToast();
 
+  // Get user from localStorage to check if admin
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const isAdmin = user?.role === 'admin';
+
   useEffect(() => {
     const inventoryItems = JSON.parse(localStorage.getItem('inventory') || '[]');
     const mappedProducts: Product[] = inventoryItems.map((item: any) => ({
@@ -85,6 +90,14 @@ export function PosContainer() {
 
   const getTotalAmount = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
+
+  const handleDeleteSale = (saleId: number) => {
+    const updatedSales = savedSales.filter(sale => sale.id !== saleId);
+    localStorage.setItem('savedSales', JSON.stringify(updatedSales));
+    setSavedSales(updatedSales);
+    setCurrentSavedSaleId(null);
+    setCart([]);
   };
 
   const handleSaveSale = (clientName: string) => {
@@ -276,6 +289,9 @@ export function PosContainer() {
               getTotalAmount={getTotalAmount}
               handleCheckout={handleCheckout}
               onSaveSale={handleSaveSale}
+              onDeleteSale={handleDeleteSale}
+              currentSavedSale={currentSavedSaleId ? savedSales.find(sale => sale.id === currentSavedSaleId) : null}
+              isAdmin={isAdmin}
             />
           </div>
         </div>

@@ -11,7 +11,9 @@ interface CartSectionProps {
   getTotalAmount: () => number;
   handleCheckout: () => void;
   onSaveSale: (clientName: string) => void;
+  onDeleteSale?: (saleId: number) => void;
   currentSavedSale?: SavedSale | null;
+  isAdmin?: boolean;
 }
 
 export function CartSection({
@@ -21,7 +23,9 @@ export function CartSection({
   getTotalAmount,
   handleCheckout,
   onSaveSale,
+  onDeleteSale,
   currentSavedSale,
+  isAdmin,
 }: CartSectionProps) {
   const [paymentMethod, setPaymentMethod] = useState<string>("efectivo");
   const [currentPage, setCurrentPage] = useState(1);
@@ -67,7 +71,9 @@ export function CartSection({
           handleCheckout={handlePaymentAndCheckout}
           cart={cart}
           onSaveSale={onSaveSale}
+          onDeleteSale={onDeleteSale}
           currentSavedSale={currentSavedSale}
+          isAdmin={isAdmin}
         />
       </div>
     </div>

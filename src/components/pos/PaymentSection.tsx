@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { SaveSaleDialog } from "./SaveSaleDialog";
 import { CartItem, SavedSale } from "@/types/pos";
-import { Save } from "lucide-react";
+import { Save, Trash2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface PaymentSectionProps {
   totalAmount: number;
@@ -12,7 +13,9 @@ interface PaymentSectionProps {
   handleCheckout: () => void;
   cart: CartItem[];
   onSaveSale: (clientName: string) => void;
+  onDeleteSale?: (saleId: number) => void;
   currentSavedSale?: SavedSale | null;
+  isAdmin?: boolean;
 }
 
 export function PaymentSection({
@@ -24,11 +27,27 @@ export function PaymentSection({
   handleCheckout,
   cart,
   onSaveSale,
+  onDeleteSale,
   currentSavedSale,
+  isAdmin,
 }: PaymentSectionProps) {
+  const { toast } = useToast();
+
   const handleQuickUpdate = () => {
     if (currentSavedSale) {
       onSaveSale(currentSavedSale.clientName);
+    }
+  };
+
+  const handleDelete = () => {
+    if (currentSavedSale && onDeleteSale) {
+      if (window.confirm(`Are you sure you want to delete the sale for ${currentSavedSale.clientName}?`)) {
+        onDeleteSale(currentSavedSale.id);
+        toast({
+          description: `Sale for ${currentSavedSale.clientName} has been deleted`,
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -109,14 +128,25 @@ export function PaymentSection({
 
       <div className="flex gap-2">
         {currentSavedSale ? (
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={handleQuickUpdate}
-          >
-            <Save className="w-4 h-4 mr-2" />
-            Update Sale for {currentSavedSale.clientName}
-          </Button>
+          <div className="w-full flex gap-2">
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={handleQuickUpdate}
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Update Sale for {currentSavedSale.clientName}
+            </Button>
+            {isAdmin && onDeleteSale && (
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                className="px-3"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
+          </div>
         ) : (
           <SaveSaleDialog
             cart={cart}
