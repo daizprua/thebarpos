@@ -16,26 +16,27 @@ export function ShiftPaymentBreakdown({ sales }: ShiftPaymentBreakdownProps) {
   // Group sales by payment method and calculate totals
   const paymentTotals = sales.reduce((acc: { [key: string]: number }, sale) => {
     // Normalize payment method to handle case and whitespace
-    let method = (sale.paymentMethod || '').toLowerCase().trim();
+    const method = sale.paymentMethod || 'Unknown';
     
     // Map payment methods to standardized names
-    switch (method) {
+    let displayMethod;
+    switch (method.toLowerCase().trim()) {
       case 'efectivo':
       case 'cash':
-        method = 'Cash';
+        displayMethod = 'Cash';
         break;
       case 'tarjeta':
       case 'card':
-        method = 'Card';
+        displayMethod = 'Card';
         break;
       case 'yappy':
-        method = 'Yappy';
+        displayMethod = 'Yappy';
         break;
       default:
-        method = 'Other';
+        displayMethod = method || 'Unknown';
     }
     
-    acc[method] = (acc[method] || 0) + sale.total;
+    acc[displayMethod] = (acc[displayMethod] || 0) + sale.total;
     return acc;
   }, {});
 
