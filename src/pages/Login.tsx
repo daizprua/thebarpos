@@ -2,17 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { authenticateUser } from "@/lib/auth";
 
-const Login = () => {
+export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const user = authenticateUser(username, password);
     
@@ -26,53 +25,50 @@ const Login = () => {
         description: `Welcome, ${user.username}!`,
       });
       
-      // If there's an active shift, go to POS, otherwise follow normal role-based routing
+      // Use navigate instead of window.location to prevent full page reload
       if (activeShift) {
         navigate('/pos');
       } else {
-        window.location.href = user.role === 'admin' ? '/inventory' : '/pos';
+        navigate(user.role === 'admin' ? '/inventory' : '/pos');
       }
     } else {
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: "Invalid username or password",
+        description: "Invalid username or password.",
       });
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1F2C] flex items-center justify-center">
-      <Card className="w-[350px]">
-        <CardHeader>
-          <CardTitle>Login</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div className="space-y-2">
-              <Input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+    <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="w-full max-w-md space-y-8 rounded-lg border bg-card p-6 shadow-lg">
+        <div className="space-y-2 text-center">
+          <h1 className="text-3xl font-bold">Welcome back</h1>
+          <p className="text-muted-foreground">Enter your credentials to continue</p>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <Button type="submit" className="w-full">
+            Sign in
+          </Button>
+        </form>
+      </div>
     </div>
   );
-};
-
-export default Login;
+}
