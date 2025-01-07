@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { ProfessionalMenu } from "@/components/ProfessionalMenu";
 import { ProductsSection } from "@/components/pos/ProductsSection";
 import { CartSection } from "@/components/pos/CartSection";
 import { Product, CartItem } from "@/types/pos";
@@ -78,7 +77,6 @@ const Pos = () => {
 
   return (
     <div className="min-h-screen bg-[#1A1F2C]">
-      <ProfessionalMenu />
       <div className="p-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-8">
