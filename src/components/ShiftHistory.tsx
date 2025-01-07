@@ -16,16 +16,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-
-const formatPaymentMethod = (method: string): string => {
-  const methodMap: { [key: string]: string } = {
-    'efectivo': 'Cash',
-    'tarjeta': 'Card',
-    'yappy': 'Yappy',
-    'unknown': 'Unknown'
-  };
-  return methodMap[method.toLowerCase()] || method;
-};
+import { ShiftPaymentBreakdown } from "./pos/ShiftPaymentBreakdown";
 
 export function ShiftHistory() {
   const [shifts, setShifts] = useState<Shift[]>(() => {
@@ -59,14 +50,6 @@ export function ShiftHistory() {
       console.error('Error loading expenses:', error);
       return [];
     }
-  };
-
-  const calculatePaymentBreakdown = (sales: Sale[]) => {
-    return sales.reduce((acc: { [key: string]: number }, sale) => {
-      const method = formatPaymentMethod(sale.paymentMethod || 'unknown');
-      acc[method] = (acc[method] || 0) + sale.total;
-      return acc;
-    }, {});
   };
 
   const handleDeleteShift = (shiftId: number) => {
@@ -106,7 +89,6 @@ export function ShiftHistory() {
         {shifts.map((shift) => {
           const shiftSales = getShiftSales(shift.id);
           const shiftExpenses = getShiftExpenses(shift.id);
-          const paymentBreakdown = calculatePaymentBreakdown(shiftSales);
           const totalSales = shiftSales.reduce((sum, sale) => sum + sale.total, 0);
           const totalExpenses = shiftExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
@@ -152,25 +134,7 @@ export function ShiftHistory() {
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <h4 className="font-medium">Payment Breakdown</h4>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Payment Method</TableHead>
-                            <TableHead className="text-right">Amount</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {Object.entries(paymentBreakdown).map(([method, amount]) => (
-                            <TableRow key={method}>
-                              <TableCell>{method}</TableCell>
-                              <TableCell className="text-right">${amount.toFixed(2)}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
+                    <ShiftPaymentBreakdown sales={shiftSales} />
 
                     {shiftExpenses.length > 0 && (
                       <div className="space-y-4">
