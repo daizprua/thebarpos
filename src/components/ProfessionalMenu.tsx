@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Package, Store, BarChart, Home, Settings, LogOut, History } from "lucide-react";
+import { Package, Store, BarChart, Home, Settings, LogOut, History, Receipt } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -70,8 +70,18 @@ export function ProfessionalMenu() {
                 to="/sales-history" 
                 className={`flex items-center gap-2 ${currentPath === "/sales-history" ? "text-primary" : ""}`}
               >
-                <History className="h-5 w-5" />
+                <Receipt className="h-5 w-5" />
                 <span>Sales History</span>
+              </Link>
+            </Button>
+
+            <Button variant="ghost" asChild>
+              <Link 
+                to="/expense-history" 
+                className={`flex items-center gap-2 ${currentPath === "/expense-history" ? "text-primary" : ""}`}
+              >
+                <History className="h-5 w-5" />
+                <span>Expense History</span>
               </Link>
             </Button>
 
