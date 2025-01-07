@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Package, Store, BarChart } from "lucide-react";
+import { Package, Store, BarChart, Home } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export function ProfessionalMenu() {
@@ -11,30 +11,45 @@ export function ProfessionalMenu() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
-            {currentPath === "/pos" && (
-              <Button variant="ghost" asChild>
-                <Link to="/" className="flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  <span>Inventory</span>
-                </Link>
-              </Button>
-            )}
-            {currentPath === "/" && (
-              <Button variant="ghost" asChild>
-                <Link to="/pos" className="flex items-center gap-2">
-                  <Store className="h-5 w-5" />
-                  <span>POS</span>
-                </Link>
-              </Button>
-            )}
-            {currentPath !== "/statistics" && (
-              <Button variant="ghost" asChild>
-                <Link to="/statistics" className="flex items-center gap-2">
-                  <BarChart className="h-5 w-5" />
-                  <span>Statistics</span>
-                </Link>
-              </Button>
-            )}
+            <Button variant="ghost" asChild>
+              <Link 
+                to="/" 
+                className={`flex items-center gap-2 ${currentPath === "/" ? "text-primary" : ""}`}
+              >
+                <Home className="h-5 w-5" />
+                <span>Home</span>
+              </Link>
+            </Button>
+
+            <Button variant="ghost" asChild>
+              <Link 
+                to="/pos" 
+                className={`flex items-center gap-2 ${currentPath === "/pos" ? "text-primary" : ""}`}
+              >
+                <Store className="h-5 w-5" />
+                <span>POS</span>
+              </Link>
+            </Button>
+
+            <Button variant="ghost" asChild>
+              <Link 
+                to="/statistics" 
+                className={`flex items-center gap-2 ${currentPath === "/statistics" ? "text-primary" : ""}`}
+              >
+                <BarChart className="h-5 w-5" />
+                <span>Statistics</span>
+              </Link>
+            </Button>
+
+            <Button variant="ghost" asChild>
+              <Link 
+                to="/inventory" 
+                className={`flex items-center gap-2 ${currentPath === "/inventory" ? "text-primary" : ""}`}
+              >
+                <Package className="h-5 w-5" />
+                <span>Inventory</span>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
