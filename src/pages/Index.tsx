@@ -19,6 +19,12 @@ const Index = () => {
     setInventory(inventory.filter(item => item.id !== id));
   };
 
+  const handleUpdateItem = (updatedItem: typeof initialInventory[0]) => {
+    setInventory(inventory.map(item => 
+      item.id === updatedItem.id ? updatedItem : item
+    ));
+  };
+
   const calculateTotalValue = () => {
     return inventory.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
@@ -46,7 +52,11 @@ const Index = () => {
 
         <div>
           <h2 className="text-xl font-semibold text-white mb-4">Current Inventory</h2>
-          <InventoryTable items={inventory} onDeleteItem={handleDeleteItem} />
+          <InventoryTable 
+            items={inventory} 
+            onDeleteItem={handleDeleteItem}
+            onUpdateItem={handleUpdateItem}
+          />
         </div>
 
         <div>
