@@ -1,15 +1,15 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { SaveSaleDialog } from "./SaveSaleDialog";
 import { CartItem, SavedSale } from "@/types/pos";
-import { Save, Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PaymentSectionProps {
   totalAmount: number;
   paymentMethod: string;
-  setPaymentMethod: (value: string) => void;
+  setPaymentMethod: (method: string) => void;
   cashReceived: string;
-  setCashReceived: (value: string) => void;
+  setCashReceived: (amount: string) => void;
   handleCheckout: () => void;
   cart: CartItem[];
   onSaveSale: (clientName: string) => void;
@@ -31,130 +31,60 @@ export function PaymentSection({
   currentSavedSale,
   isAdmin,
 }: PaymentSectionProps) {
-  const { toast } = useToast();
-
-  const handleQuickUpdate = () => {
-    if (currentSavedSale) {
-      onSaveSale(currentSavedSale.clientName);
-    }
-  };
-
-  const handleDelete = () => {
-    if (currentSavedSale && onDeleteSale) {
-      if (window.confirm(`Are you sure you want to delete the sale for ${currentSavedSale.clientName}?`)) {
-        onDeleteSale(currentSavedSale.id);
-        toast({
-          description: `Sale for ${currentSavedSale.clientName} has been deleted`,
-          variant: "destructive",
-        });
-      }
-    }
-  };
+  const change = cashReceived
+    ? parseFloat(cashReceived) - totalAmount
+    : 0;
 
   return (
-    <div className="mt-4 space-y-4">
-      <div className="flex flex-col gap-4">
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            className={`flex-1 ${
-              paymentMethod === "efectivo" ? "bg-primary text-primary-foreground" : ""
-            }`}
-            onClick={() => setPaymentMethod("efectivo")}
-          >
-            Efectivo
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className={`flex-1 ${
-              paymentMethod === "tarjeta" ? "bg-primary text-primary-foreground" : ""
-            }`}
-            onClick={() => setPaymentMethod("tarjeta")}
-          >
-            Tarjeta
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className={`flex-1 ${
-              paymentMethod === "yappy" ? "bg-primary text-primary-foreground" : ""
-            }`}
-            onClick={() => setPaymentMethod("yappy")}
-          >
-            Yappy
-          </Button>
-        </div>
+    <div className="mt-6 space-y-4">
+      <div className="flex justify-between text-lg font-semibold text-white">
+        <span>Total:</span>
+        <span>${totalAmount.toFixed(2)}</span>
+      </div>
+
+      <div className="space-y-4">
+        <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+          <SelectTrigger className="bg-background/50 text-white">
+            <SelectValue placeholder="Select payment method" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="efectivo">Cash</SelectItem>
+            <SelectItem value="tarjeta">Card</SelectItem>
+            <SelectItem value="yappy">Yappy</SelectItem>
+          </SelectContent>
+        </Select>
 
         {paymentMethod === "efectivo" && (
           <div className="space-y-2">
-            <label htmlFor="cashReceived" className="text-sm font-medium text-white">
-              Cash Received
-            </label>
-            <input
-              id="cashReceived"
+            <Input
               type="number"
+              placeholder="Cash received"
               value={cashReceived}
               onChange={(e) => setCashReceived(e.target.value)}
-              className="w-full px-3 py-2 bg-background border border-input rounded-md"
-              placeholder="Enter amount"
+              className="bg-background/50 text-white"
             />
-            {cashReceived && (
-              <div className="text-sm">
-                <span className="text-gray-400">Change: </span>
-                <span className="font-medium text-white">
-                  ${(Number(cashReceived) - totalAmount).toFixed(2)}
-                </span>
-              </div>
-            )}
+            <div className="flex justify-between text-sm text-white">
+              <span>Change:</span>
+              <span>${change.toFixed(2)}</span>
+            </div>
           </div>
         )}
-      </div>
 
-      <div className="flex gap-2">
-        <Button
-          className="w-full"
-          onClick={handleCheckout}
-          disabled={
-            !paymentMethod ||
-            (paymentMethod === "efectivo" &&
-              (!cashReceived || parseFloat(cashReceived) < totalAmount))
-          }
-        >
-          Checkout (${totalAmount.toFixed(2)})
-        </Button>
-      </div>
-
-      <div className="flex gap-2">
-        {currentSavedSale ? (
-          <div className="w-full flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={handleQuickUpdate}
-            >
-              <Save className="w-4 h-4 mr-2" />
-              Update Sale for {currentSavedSale.clientName}
-            </Button>
-            {isAdmin && onDeleteSale && (
-              <Button
-                variant="destructive"
-                onClick={handleDelete}
-                className="px-3"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            )}
-          </div>
-        ) : (
+        <div className="flex gap-2">
+          <Button
+            className="w-full"
+            onClick={handleCheckout}
+            disabled={cart.length === 0}
+          >
+            Complete Sale
+          </Button>
           <SaveSaleDialog
-            cart={cart}
-            total={totalAmount}
             onSave={onSaveSale}
+            onDelete={onDeleteSale}
             currentSavedSale={currentSavedSale}
+            isAdmin={isAdmin}
           />
-        )}
+        </div>
       </div>
     </div>
   );
