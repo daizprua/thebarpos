@@ -5,19 +5,9 @@ import { CartSection } from "@/components/pos/CartSection";
 import { ShiftControls } from "@/components/pos/ShiftControls";
 import { Product, CartItem, Shift } from "@/types/pos";
 
-const mockProducts: Product[] = [
-  { id: 1, name: "Grey Goose Vodka", category: "Spirits", price: 29.99 },
-  { id: 2, name: "Heineken", category: "Beer", price: 4.99 },
-  { id: 3, name: "Dom Pérignon", category: "Wine", price: 199.99 },
-  { id: 4, name: "Coca-Cola", category: "Mixers", price: 2.99 },
-  { id: 5, name: "Jack Daniel's", category: "Spirits", price: 25.99 },
-  { id: 6, name: "Corona", category: "Beer", price: 3.99 },
-  { id: 7, name: "Red Bull", category: "Mixers", price: 3.99 },
-  { id: 8, name: "Moet", category: "Wine", price: 49.99 },
-];
-
 const Pos = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [activeShift, setActiveShift] = useState<{
     startTime: string;
     id: number;
@@ -26,6 +16,19 @@ const Pos = () => {
     return saved ? JSON.parse(saved) : null;
   });
   const { toast } = useToast();
+
+  // Load inventory items as products
+  useEffect(() => {
+    const inventoryItems = JSON.parse(localStorage.getItem('inventory') || '[]');
+    const mappedProducts: Product[] = inventoryItems.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      category: item.category,
+      price: item.price,
+      imageUrl: item.imageUrl
+    }));
+    setProducts(mappedProducts);
+  }, []);
 
   const startShift = (initialCash: number) => {
     const newShift = {
@@ -180,7 +183,7 @@ const Pos = () => {
             onEndShift={endShift}
           />
           <div className="flex flex-col lg:flex-row gap-8">
-            <ProductsSection products={mockProducts} addToCart={addToCart} />
+            <ProductsSection products={products} addToCart={addToCart} />
             <CartSection
               cart={cart}
               updateQuantity={updateQuantity}
