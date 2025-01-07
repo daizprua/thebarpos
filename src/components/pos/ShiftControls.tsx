@@ -10,6 +10,16 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Shift, Expense, ShiftSummary } from "@/types/pos";
 import { ExpenseForm } from "./ExpenseForm";
@@ -25,6 +35,7 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
   const [showStartDialog, setShowStartDialog] = useState(false);
   const [showExpenseDialog, setShowExpenseDialog] = useState(false);
   const [showEndShiftDialog, setShowEndShiftDialog] = useState(false);
+  const [showConfirmEndDialog, setShowConfirmEndDialog] = useState(false);
   const [initialCash, setInitialCash] = useState("");
   const [showHistory, setShowHistory] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -115,11 +126,20 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
 
   const handleEndShiftConfirm = () => {
     if (shiftSummary) {
-      onEndShift();
-      setShowEndShiftDialog(false);
-      setExpenses([]);
-      setShiftSummary(null);
+      setShowConfirmEndDialog(true);
     }
+  };
+
+  const handleFinalEndShift = () => {
+    onEndShift();
+    setShowEndShiftDialog(false);
+    setShowConfirmEndDialog(false);
+    setExpenses([]);
+    setShiftSummary(null);
+    toast({
+      title: "Shift Ended",
+      description: "Your shift has been successfully ended.",
+    });
   };
 
   const canEndShift = activeShift && user?.role === 'admin';
@@ -204,11 +224,28 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
                     Cancel
                   </Button>
                   <Button variant="destructive" onClick={handleEndShiftConfirm}>
-                    Confirm & End Shift
+                    End Shift
                   </Button>
                 </div>
               </DialogContent>
             </Dialog>
+
+            <AlertDialog open={showConfirmEndDialog} onOpenChange={setShowConfirmEndDialog}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently end your shift and save all records.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => setShowConfirmEndDialog(false)}>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleFinalEndShift} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    End Shift
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </>
         )}
         {activeShift && (
