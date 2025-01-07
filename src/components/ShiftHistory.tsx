@@ -16,7 +16,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ShiftPaymentBreakdown } from "./pos/ShiftPaymentBreakdown";
 
 export function ShiftHistory() {
   const [shifts, setShifts] = useState<Shift[]>(() => {
@@ -100,8 +99,11 @@ export function ShiftHistory() {
 
           // Group sales by payment method
           const salesByPaymentMethod = shiftSales.reduce((acc: { [key: string]: number }, sale) => {
-            const method = sale.paymentMethod || 'unknown';
-            acc[method] = (acc[method] || 0) + sale.total;
+            console.log('Sale payment method:', sale.paymentMethod); // Debug log
+            const method = sale.paymentMethod;
+            if (method) {
+              acc[method] = (acc[method] || 0) + sale.total;
+            }
             return acc;
           }, {});
 
