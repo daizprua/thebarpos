@@ -4,7 +4,20 @@ import { InventoryTable } from "@/components/InventoryTable";
 import { QuickAddForm } from "@/components/QuickAddForm";
 import { ArticleManager } from "@/components/ArticleManager";
 import { ExcelImport } from "@/components/ExcelImport";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 interface InventoryItem {
   id: number;
@@ -25,6 +38,7 @@ const initialInventory = [
 
 const Index = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     const savedInventory = localStorage.getItem('inventory');
@@ -55,7 +69,7 @@ const Index = () => {
     const itemWithDefaults: InventoryItem = {
       ...newItem,
       id: newId,
-      threshold: 10, // Default threshold
+      threshold: 10,
     };
     const updatedInventory = [...inventory, itemWithDefaults];
     setInventory(updatedInventory);
@@ -68,8 +82,13 @@ const Index = () => {
     localStorage.setItem('inventory', JSON.stringify(updatedInventory));
   };
 
-  const calculateTotalValue = () => {
-    return inventory.reduce((total, item) => total + (item.price * item.quantity), 0);
+  const handleDeleteAllItems = () => {
+    setInventory([]);
+    localStorage.setItem('inventory', JSON.stringify([]));
+    toast({
+      title: "Inventory Cleared",
+      description: "All products have been deleted from the inventory.",
+    });
   };
 
   return (
@@ -92,7 +111,29 @@ const Index = () => {
 
           <div className="flex justify-between items-center">
             <QuickAddForm />
-            <ExcelImport onImport={handleImportItems} />
+            <div className="flex gap-4">
+              <ExcelImport onImport={handleImportItems} />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive">Delete All Products</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete all products
+                      from your inventory.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteAllItems}>
+                      Delete All
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
 
           <div>
