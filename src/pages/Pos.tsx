@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ProductsSection } from "@/components/pos/ProductsSection";
 import { CartSection } from "@/components/pos/CartSection";
+import { SalesHistory } from "@/components/pos/SalesHistory";
 import { Product, CartItem } from "@/types/pos";
 
 const mockProducts: Product[] = [
@@ -78,7 +79,7 @@ const Pos = () => {
   return (
     <div className="min-h-screen bg-[#1A1F2C]">
       <div className="p-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex flex-col lg:flex-row gap-8">
             <ProductsSection products={mockProducts} addToCart={addToCart} />
             <CartSection
@@ -89,6 +90,7 @@ const Pos = () => {
               handleCheckout={handleCheckout}
             />
           </div>
+          <SalesHistory />
         </div>
       </div>
     </div>
