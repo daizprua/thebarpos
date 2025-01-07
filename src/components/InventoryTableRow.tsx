@@ -2,7 +2,19 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Pencil, Upload } from "lucide-react";
+import { Trash2, Pencil } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 interface InventoryItem {
   id: number;
@@ -37,6 +49,9 @@ export const InventoryTableRow = ({
   onInputChange,
   getStockStatus,
 }: InventoryTableRowProps) => {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -46,6 +61,16 @@ export const InventoryTableRow = ({
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleConfirmDelete = () => {
+    onDelete(item.id);
+    setShowDeleteDialog(false);
+  };
+
+  const handleConfirmEdit = () => {
+    onEdit(item);
+    setShowEditDialog(false);
   };
 
   if (editingId === item.id) {
@@ -100,9 +125,25 @@ export const InventoryTableRow = ({
         </TableCell>
         <TableCell>{getStockStatus(item.quantity, item.threshold)}</TableCell>
         <TableCell className="space-x-2">
-          <Button variant="default" size="sm" onClick={onSave}>
-            Save
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="default" size="sm">
+                Save
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm Save Changes</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to save these changes? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={onSave}>Save Changes</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <Button variant="outline" size="sm" onClick={onCancel}>
             Cancel
           </Button>
@@ -130,20 +171,55 @@ export const InventoryTableRow = ({
       <TableCell className="text-gray-300">${item.price?.toFixed(2)}</TableCell>
       <TableCell>{getStockStatus(item.quantity, item.threshold)}</TableCell>
       <TableCell className="space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => onEdit(item)}
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => onDelete(item.id)}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <AlertDialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Edit Item</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to edit this item? You can review and save your changes after.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleConfirmEdit}>
+                Edit Item
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogTrigger asChild>
+            <Button
+              variant="destructive"
+              size="sm"
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Item</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this item? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleConfirmDelete}>
+                Delete Item
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </TableCell>
     </TableRow>
   );
