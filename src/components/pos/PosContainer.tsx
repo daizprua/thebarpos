@@ -10,6 +10,7 @@ export function PosContainer() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [savedSales, setSavedSales] = useState<SavedSale[]>([]);
+  const [currentSavedSaleId, setCurrentSavedSaleId] = useState<number | null>(null);
   const [activeShift, setActiveShift] = useState<{
     startTime: string;
     id: number;
@@ -89,25 +90,70 @@ export function PosContainer() {
   const handleSaveSale = (clientName: string) => {
     if (!activeShift) return;
     
-    const savedSale: SavedSale = {
-      id: Date.now(),
-      clientName,
-      items: cart,
-      total: getTotalAmount(),
-      date: new Date().toISOString(),
-      shiftId: activeShift.id,
-    };
+    const currentTime = new Date().toISOString();
+    
+    if (currentSavedSaleId) {
+      // Update existing saved sale
+      const updatedSales = savedSales.map(sale => 
+        sale.id === currentSavedSaleId 
+          ? {
+              ...sale,
+              clientName,
+              items: cart,
+              total: getTotalAmount(),
+              date: currentTime
+            }
+          : sale
+      );
+      
+      localStorage.setItem('savedSales', JSON.stringify(updatedSales));
+      setSavedSales(updatedSales);
+      
+      toast({
+        title: "Sale Updated",
+        description: `Sale updated for ${clientName}`,
+      });
+    } else {
+      // Create new saved sale
+      const savedSale: SavedSale = {
+        id: Date.now(),
+        clientName,
+        items: cart,
+        total: getTotalAmount(),
+        date: currentTime,
+        shiftId: activeShift.id,
+      };
 
-    const savedSales = JSON.parse(localStorage.getItem('savedSales') || '[]');
-    const updatedSales = [...savedSales, savedSale];
-    localStorage.setItem('savedSales', JSON.stringify(updatedSales));
-    setSavedSales(updatedSales);
+      const updatedSales = [...savedSales, savedSale];
+      localStorage.setItem('savedSales', JSON.stringify(updatedSales));
+      setSavedSales(updatedSales);
+      setCurrentSavedSaleId(savedSale.id);
 
+      toast({
+        title: "Sale Saved",
+        description: `Sale saved for ${clientName}`,
+      });
+    }
+  };
+
+  const handleLoadSale = (sale: SavedSale) => {
+    setCart(sale.items);
+    setCurrentSavedSaleId(sale.id);
     toast({
-      title: "Sale Saved",
-      description: `Sale saved for ${clientName}`,
+      description: `Loaded sale for ${sale.clientName}`,
     });
-    setCart([]);
+  };
+
+  const handleNewSale = () => {
+    if (cart.length > 0) {
+      if (window.confirm('Starting a new sale will clear the current cart. Continue?')) {
+        setCart([]);
+        setCurrentSavedSaleId(null);
+      }
+    } else {
+      setCart([]);
+      setCurrentSavedSaleId(null);
+    }
   };
 
   const handleCheckout = () => {
@@ -139,29 +185,19 @@ export function PosContainer() {
     const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
     localStorage.setItem('sales', JSON.stringify([...existingSales, newSale]));
 
+    // If this was a saved sale, remove it from saved sales
+    if (currentSavedSaleId) {
+      const updatedSavedSales = savedSales.filter(sale => sale.id !== currentSavedSaleId);
+      localStorage.setItem('savedSales', JSON.stringify(updatedSavedSales));
+      setSavedSales(updatedSavedSales);
+      setCurrentSavedSaleId(null);
+    }
+
     toast({
       title: "Order Completed",
       description: `Total Amount: $${getTotalAmount().toFixed(2)}`,
     });
     setCart([]);
-  };
-
-  const handleLoadSale = (sale: SavedSale) => {
-    setCart(sale.items);
-    // Remove the sale from saved sales
-    const updatedSales = savedSales.filter(s => s.id !== sale.id);
-    setSavedSales(updatedSales);
-    localStorage.setItem('savedSales', JSON.stringify(updatedSales));
-  };
-
-  const handleNewSale = () => {
-    if (cart.length > 0) {
-      if (window.confirm('Starting a new sale will clear the current cart. Continue?')) {
-        setCart([]);
-      }
-    } else {
-      setCart([]);
-    }
   };
 
   return (
