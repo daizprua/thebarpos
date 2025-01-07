@@ -11,26 +11,34 @@ export default function Login() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const user = authenticateUser(username, password);
     
     if (user) {
-      // Get the active shift before updating user
-      const activeShift = localStorage.getItem('activeShift');
-      
       localStorage.setItem('user', JSON.stringify(user));
+      
+      const activeShiftStr = localStorage.getItem('activeShift');
+      const activeShift = activeShiftStr ? JSON.parse(activeShiftStr) : null;
+      
       toast({
-        title: "Login successful",
+        title: "Success",
         description: `Welcome, ${user.username}!`,
       });
+
+      // Force a re-render by setting state in localStorage first
+      localStorage.setItem('lastLogin', new Date().toISOString());
       
-      // Use navigate instead of window.location to prevent full page reload
-      if (activeShift) {
-        navigate('/pos');
-      } else {
-        navigate(user.role === 'admin' ? '/inventory' : '/pos');
-      }
+      // Small timeout to ensure state is updated before navigation
+      setTimeout(() => {
+        if (activeShift) {
+          navigate('/pos', { replace: true });
+        } else {
+          navigate(user.role === 'admin' ? '/inventory' : '/pos', { replace: true });
+        }
+        // Force a re-render after navigation
+        window.dispatchEvent(new Event('storage'));
+      }, 100);
     } else {
       toast({
         variant: "destructive",
