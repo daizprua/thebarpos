@@ -48,7 +48,6 @@ export function SalesHistory() {
   const userIsAdmin = isAdmin(user);
 
   useEffect(() => {
-    // Load sales from localStorage
     const savedSales = JSON.parse(localStorage.getItem('sales') || '[]');
     setSales(savedSales);
   }, []);
@@ -88,38 +87,38 @@ export function SalesHistory() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-white">Sales History</h2>
         <Select value={timeRange} onValueChange={(value: TimeRange) => setTimeRange(value)}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-[180px] bg-card text-white">
             <SelectValue placeholder="Select time range" />
           </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="day">Today</SelectItem>
-            <SelectItem value="week">This Week</SelectItem>
-            <SelectItem value="month">This Month</SelectItem>
+          <SelectContent className="bg-card border-border">
+            <SelectItem value="day" className="text-white hover:bg-muted/50">Today</SelectItem>
+            <SelectItem value="week" className="text-white hover:bg-muted/50">This Week</SelectItem>
+            <SelectItem value="month" className="text-white hover:bg-muted/50">This Month</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <div className="rounded-md border bg-card/50 backdrop-blur-lg">
+      <div className="rounded-md border bg-card backdrop-blur-none">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Date</TableHead>
-              <TableHead>Items</TableHead>
-              <TableHead>Payment Method</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              {userIsAdmin && <TableHead className="w-[100px]">Actions</TableHead>}
+            <TableRow className="border-border hover:bg-muted/50">
+              <TableHead className="text-white">Date</TableHead>
+              <TableHead className="text-white">Items</TableHead>
+              <TableHead className="text-white">Payment Method</TableHead>
+              <TableHead className="text-right text-white">Total</TableHead>
+              {userIsAdmin && <TableHead className="w-[100px] text-white">Actions</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredSales.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={userIsAdmin ? 5 : 4} className="text-center">No sales found</TableCell>
+                <TableCell colSpan={userIsAdmin ? 5 : 4} className="text-center text-white">No sales found</TableCell>
               </TableRow>
             ) : (
               filteredSales.map((sale) => (
-                <TableRow key={sale.id}>
-                  <TableCell>{format(new Date(sale.date), "PPp")}</TableCell>
-                  <TableCell>
+                <TableRow key={sale.id} className="border-border hover:bg-muted/50">
+                  <TableCell className="text-white">{format(new Date(sale.date), "PPp")}</TableCell>
+                  <TableCell className="text-white">
                     <ul className="list-disc list-inside">
                       {sale.items.map((item, index) => (
                         <li key={index}>
@@ -128,8 +127,8 @@ export function SalesHistory() {
                       ))}
                     </ul>
                   </TableCell>
-                  <TableCell>{formatPaymentMethod(sale.paymentMethod)}</TableCell>
-                  <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
+                  <TableCell className="text-white">{formatPaymentMethod(sale.paymentMethod)}</TableCell>
+                  <TableCell className="text-right text-white">${sale.total.toFixed(2)}</TableCell>
                   {userIsAdmin && (
                     <TableCell>
                       <Button
