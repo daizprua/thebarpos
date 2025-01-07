@@ -3,6 +3,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { InventoryTable } from "@/components/InventoryTable";
 import { QuickAddForm } from "@/components/QuickAddForm";
 import { ArticleManager } from "@/components/ArticleManager";
+import { ExcelImport } from "@/components/ExcelImport";
 import { useState } from "react";
 
 const initialInventory = [
@@ -23,6 +24,10 @@ const Index = () => {
     setInventory(inventory.map(item => 
       item.id === updatedItem.id ? updatedItem : item
     ));
+  };
+
+  const handleImportItems = (importedItems: typeof initialInventory) => {
+    setInventory([...inventory, ...importedItems]);
   };
 
   const calculateTotalValue = () => {
@@ -48,7 +53,10 @@ const Index = () => {
           <StatsCard title="Items Sold Today" value="47" icon={<Wine />} />
         </div>
 
-        <QuickAddForm />
+        <div className="flex justify-between items-center">
+          <QuickAddForm />
+          <ExcelImport onImport={handleImportItems} />
+        </div>
 
         <div>
           <h2 className="text-xl font-semibold text-white mb-4">Current Inventory</h2>
