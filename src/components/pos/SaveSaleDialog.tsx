@@ -8,22 +8,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CartItem, SavedSale } from "@/types/pos";
+import { SavedSale } from "@/types/pos";
 import { useToast } from "@/hooks/use-toast";
 
 interface SaveSaleDialogProps {
-  cart: CartItem[];
-  total: number;
   onSave: (clientName: string) => void;
+  onDelete?: (saleId: number) => void;
   currentSavedSale?: SavedSale | null;
+  isAdmin?: boolean;
 }
 
-export function SaveSaleDialog({ cart, total, onSave, currentSavedSale }: SaveSaleDialogProps) {
+export function SaveSaleDialog({ onSave, onDelete, currentSavedSale, isAdmin }: SaveSaleDialogProps) {
   const [open, setOpen] = useState(false);
   const [clientName, setClientName] = useState("");
   const { toast } = useToast();
 
-  // Set the client name when editing an existing sale
   useEffect(() => {
     if (currentSavedSale) {
       setClientName(currentSavedSale.clientName);
@@ -41,6 +40,13 @@ export function SaveSaleDialog({ cart, total, onSave, currentSavedSale }: SaveSa
     }
     onSave(clientName);
     setOpen(false);
+  };
+
+  const handleDelete = () => {
+    if (currentSavedSale && onDelete) {
+      onDelete(currentSavedSale.id);
+      setOpen(false);
+    }
   };
 
   return (
@@ -67,19 +73,16 @@ export function SaveSaleDialog({ cart, total, onSave, currentSavedSale }: SaveSa
               className="mt-1"
             />
           </div>
-          <div className="pt-2">
-            <div className="flex justify-between mb-2">
-              <span>Total Amount:</span>
-              <span className="font-semibold">${total.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between mb-4">
-              <span>Items:</span>
-              <span className="font-semibold">{cart.length}</span>
-            </div>
+          <div className="flex gap-2">
+            <Button onClick={handleSave} className="flex-1">
+              {currentSavedSale ? 'Update Sale' : 'Save Sale'}
+            </Button>
+            {currentSavedSale && isAdmin && onDelete && (
+              <Button onClick={handleDelete} variant="destructive">
+                Delete
+              </Button>
+            )}
           </div>
-          <Button onClick={handleSave} className="w-full">
-            {currentSavedSale ? 'Update Sale' : 'Save Sale'}
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
