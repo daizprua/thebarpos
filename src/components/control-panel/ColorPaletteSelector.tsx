@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -37,11 +36,12 @@ export const ColorPaletteSelector = () => {
   });
 
   const applyPalette = (palette: typeof colorPalettes[keyof typeof colorPalettes]) => {
-    document.documentElement.style.setProperty('--primary', palette.primary);
-    document.documentElement.style.setProperty('--secondary', palette.secondary);
-    document.documentElement.style.setProperty('--accent', palette.accent);
-    document.documentElement.style.setProperty('--warning', palette.warning);
-    document.documentElement.style.setProperty('--card', palette.card);
+    const root = document.documentElement;
+    root.style.setProperty('--primary', palette.primary);
+    root.style.setProperty('--secondary', palette.secondary);
+    root.style.setProperty('--accent', palette.accent);
+    root.style.setProperty('--warning', palette.warning);
+    root.style.setProperty('--card', palette.card);
   };
 
   useEffect(() => {
@@ -49,6 +49,9 @@ export const ColorPaletteSelector = () => {
     if (savedPalette) {
       setSelectedPalette(savedPalette as keyof typeof colorPalettes);
       applyPalette(colorPalettes[savedPalette as keyof typeof colorPalettes]);
+    } else {
+      // Apply default palette if none is saved
+      applyPalette(colorPalettes.default);
     }
   }, []);
 
