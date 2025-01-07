@@ -1,19 +1,8 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { Minus, Plus, ShoppingCart, X } from "lucide-react";
+import { ShoppingCart } from "lucide-react";
 import { CartItem } from "@/types/pos";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+import { CartItemList } from "./CartItemList";
+import { PaymentSection } from "./PaymentSection";
 
 interface CartSectionProps {
   cart: CartItem[];
@@ -35,20 +24,18 @@ export function CartSection({
   const [cashReceived, setCashReceived] = useState<string>("");
   const itemsPerPage = 12;
 
+  const totalAmount = getTotalAmount();
+  const totalPages = Math.ceil(cart.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = cart.slice(startIndex, endIndex);
+
   const handlePaymentAndCheckout = () => {
     if (!paymentMethod) {
       return;
     }
     handleCheckout();
   };
-
-  const totalAmount = getTotalAmount();
-  const change = cashReceived ? parseFloat(cashReceived) - totalAmount : 0;
-
-  const totalPages = Math.ceil(cart.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = cart.slice(startIndex, endIndex);
 
   return (
     <div className="lg:w-1/3">
@@ -58,149 +45,23 @@ export function CartSection({
           <h2 className="text-2xl font-bold text-white">Cart</h2>
         </div>
 
-        <ScrollArea className="h-[400px] pr-4">
-          {currentItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex items-start justify-between py-4 border-b border-gray-700"
-            >
-              <div className="flex-1">
-                <h3 className="font-medium text-white">{item.name}</h3>
-                <p className="text-sm text-gray-400">
-                  ${item.price.toFixed(2)} x {item.quantity}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => updateQuantity(item.id, -1)}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="w-8 text-center text-white">
-                    {item.quantity}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => updateQuantity(item.id, 1)}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-red-500 hover:text-red-600"
-                  onClick={() => removeFromCart(item.id)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          ))}
-        </ScrollArea>
+        <CartItemList
+          currentItems={currentItems}
+          updateQuantity={updateQuantity}
+          removeFromCart={removeFromCart}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          totalPages={totalPages}
+        />
 
-        {totalPages > 1 && (
-          <div className="mt-4">
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <PaginationItem key={page}>
-                    <PaginationLink
-                      onClick={() => setCurrentPage(page)}
-                      isActive={currentPage === page}
-                    >
-                      {page}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-                <PaginationItem>
-                  <PaginationNext
-                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </div>
-        )}
-
-        <div className="mt-4 pt-4 border-t border-gray-700">
-          <div className="flex justify-between mb-4">
-            <span className="text-lg font-semibold text-white">Total:</span>
-            <span className="text-lg font-bold text-white">
-              ${totalAmount.toFixed(2)}
-            </span>
-          </div>
-
-          <div className="mb-4">
-            <h3 className="text-white mb-2">Payment Method</h3>
-            <RadioGroup
-              value={paymentMethod}
-              onValueChange={setPaymentMethod}
-              className="gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="efectivo" id="efectivo" />
-                <Label htmlFor="efectivo" className="text-white">Efectivo</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="tarjeta" id="tarjeta" />
-                <Label htmlFor="tarjeta" className="text-white">Tarjeta</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="yappy" id="yappy" />
-                <Label htmlFor="yappy" className="text-white">Yappy</Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          {paymentMethod === "efectivo" && (
-            <div className="mb-4 space-y-4">
-              <div>
-                <Label htmlFor="cashReceived" className="text-white">Cash Received</Label>
-                <Input
-                  id="cashReceived"
-                  type="number"
-                  value={cashReceived}
-                  onChange={(e) => setCashReceived(e.target.value)}
-                  placeholder="Enter amount received"
-                  className="mt-1"
-                />
-              </div>
-              {cashReceived && (
-                <div className="p-4 bg-card rounded-lg">
-                  <div className="flex justify-between text-white">
-                    <span>Change:</span>
-                    <span className={change >= 0 ? "text-green-500" : "text-red-500"}>
-                      ${change.toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          <Button 
-            className="w-full" 
-            size="lg" 
-            onClick={handlePaymentAndCheckout}
-            disabled={!paymentMethod || (paymentMethod === "efectivo" && (!cashReceived || parseFloat(cashReceived) < totalAmount))}
-          >
-            Checkout
-          </Button>
-        </div>
+        <PaymentSection
+          totalAmount={totalAmount}
+          paymentMethod={paymentMethod}
+          setPaymentMethod={setPaymentMethod}
+          cashReceived={cashReceived}
+          setCashReceived={setCashReceived}
+          handleCheckout={handlePaymentAndCheckout}
+        />
       </div>
     </div>
   );
