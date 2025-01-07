@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SaveSaleDialog } from "./SaveSaleDialog";
 import { CartItem, SavedSale } from "@/types/pos";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PaymentSectionProps {
   totalAmount: number;
@@ -43,16 +42,29 @@ export function PaymentSection({
       </div>
 
       <div className="space-y-4">
-        <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-          <SelectTrigger className="bg-background/50 text-white">
-            <SelectValue placeholder="Select payment method" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="efectivo">Cash</SelectItem>
-            <SelectItem value="tarjeta">Card</SelectItem>
-            <SelectItem value="yappy">Yappy</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="grid grid-cols-3 gap-2">
+          <Button
+            variant={paymentMethod === "efectivo" ? "default" : "outline"}
+            onClick={() => setPaymentMethod("efectivo")}
+            className="w-full"
+          >
+            Cash
+          </Button>
+          <Button
+            variant={paymentMethod === "tarjeta" ? "default" : "outline"}
+            onClick={() => setPaymentMethod("tarjeta")}
+            className="w-full"
+          >
+            Card
+          </Button>
+          <Button
+            variant={paymentMethod === "yappy" ? "default" : "outline"}
+            onClick={() => setPaymentMethod("yappy")}
+            className="w-full"
+          >
+            Yappy
+          </Button>
+        </div>
 
         {paymentMethod === "efectivo" && (
           <div className="space-y-2">
