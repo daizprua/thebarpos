@@ -23,6 +23,10 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
   const [initialCash, setInitialCash] = useState("");
   const [showHistory, setShowHistory] = useState(false);
   const { toast } = useToast();
+  
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  
   const [shifts, setShifts] = useState<Shift[]>(() => {
     try {
       const savedShifts = JSON.parse(localStorage.getItem('shifts') || '[]');
@@ -32,7 +36,6 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
     }
   });
 
-  // Update shifts state when localStorage changes
   useEffect(() => {
     const handleStorageChange = () => {
       try {
@@ -57,10 +60,22 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
       });
       return;
     }
+    
+    // Store the username of who started the shift
+    const shiftData = {
+      startTime: new Date().toISOString(),
+      id: Date.now(),
+      initialCash: amount,
+      startedBy: user?.username
+    };
+    localStorage.setItem('activeShift', JSON.stringify(shiftData));
+    
     onStartShift(amount);
     setShowStartDialog(false);
     setInitialCash("");
   };
+
+  const canEndShift = activeShift && user?.role === 'admin';
 
   return (
     <div className="flex justify-between items-center">
@@ -99,14 +114,22 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
             </DialogContent>
           </Dialog>
         ) : (
-          <Button 
-            onClick={onEndShift}
-            variant="destructive"
-            className="flex items-center gap-2"
-          >
-            <StopCircle className="h-4 w-4" />
-            End Shift
-          </Button>
+          <>
+            {canEndShift ? (
+              <Button 
+                onClick={onEndShift}
+                variant="destructive"
+                className="flex items-center gap-2"
+              >
+                <StopCircle className="h-4 w-4" />
+                End Shift
+              </Button>
+            ) : (
+              <span className="text-sm text-muted-foreground">
+                Only admins can end shifts
+              </span>
+            )}
+          </>
         )}
         {activeShift && (
           <span className="text-white">

@@ -17,14 +17,21 @@ const Login = () => {
     const user = authenticateUser(username, password);
     
     if (user) {
+      // Get the active shift before updating user
+      const activeShift = localStorage.getItem('activeShift');
+      
       localStorage.setItem('user', JSON.stringify(user));
       toast({
         title: "Login successful",
         description: `Welcome, ${user.username}!`,
       });
       
-      // Force a page reload to update the app state
-      window.location.href = user.role === 'admin' ? '/inventory' : '/pos';
+      // If there's an active shift, go to POS, otherwise follow normal role-based routing
+      if (activeShift) {
+        navigate('/pos');
+      } else {
+        window.location.href = user.role === 'admin' ? '/inventory' : '/pos';
+      }
     } else {
       toast({
         variant: "destructive",

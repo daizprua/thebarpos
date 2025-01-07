@@ -10,6 +10,9 @@ export function ProfessionalMenu() {
   
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
+  
+  const activeShiftStr = localStorage.getItem('activeShift');
+  const activeShift = activeShiftStr ? JSON.parse(activeShiftStr) : null;
 
   const handleRestrictedAccess = (e: React.MouseEvent) => {
     if (user?.role === 'cajero') {
@@ -36,6 +39,11 @@ export function ProfessionalMenu() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
+            {activeShift && (
+              <span className="text-sm text-muted-foreground">
+                Shift started by: {activeShift.startedBy}
+              </span>
+            )}
             <Button variant="ghost" asChild>
               <Link 
                 to="/" 

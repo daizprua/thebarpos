@@ -25,4 +25,5 @@ export interface Shift {
   initialCash: number;
   totalSales: number;
   numberOfTransactions: number;
+  startedBy?: string;
 }
