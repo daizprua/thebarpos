@@ -5,6 +5,15 @@ import { CartItem } from "@/types/pos";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface CartSectionProps {
   cart: CartItem[];
@@ -22,6 +31,9 @@ export function CartSection({
   handleCheckout,
 }: CartSectionProps) {
   const [paymentMethod, setPaymentMethod] = useState<string>("efectivo");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   const handlePaymentAndCheckout = () => {
     if (!paymentMethod) {
@@ -29,6 +41,15 @@ export function CartSection({
     }
     handleCheckout();
   };
+
+  const filteredCart = cart.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredCart.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = filteredCart.slice(startIndex, endIndex);
 
   return (
     <div className="lg:w-1/3">
@@ -38,8 +59,18 @@ export function CartSection({
           <h2 className="text-2xl font-bold text-white">Cart</h2>
         </div>
 
+        <div className="mb-4">
+          <Input
+            type="search"
+            placeholder="Search items..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
+          />
+        </div>
+
         <ScrollArea className="h-[400px] pr-4">
-          {cart.map((item) => (
+          {currentItems.map((item) => (
             <div
               key={item.id}
               className="flex items-start justify-between py-4 border-b border-gray-700"
@@ -84,6 +115,37 @@ export function CartSection({
             </div>
           ))}
         </ScrollArea>
+
+        {totalPages > 1 && (
+          <div className="mt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <PaginationItem key={page}>
+                    <PaginationLink
+                      onClick={() => setCurrentPage(page)}
+                      isActive={currentPage === page}
+                    >
+                      {page}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
 
         <div className="mt-4 pt-4 border-t border-gray-700">
           <div className="flex justify-between mb-4">
