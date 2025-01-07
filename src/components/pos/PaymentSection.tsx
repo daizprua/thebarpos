@@ -1,6 +1,3 @@
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SaveSaleDialog } from "./SaveSaleDialog";
 import { CartItem, SavedSale } from "@/types/pos";
@@ -29,15 +26,6 @@ export function PaymentSection({
   onSaveSale,
   currentSavedSale,
 }: PaymentSectionProps) {
-  const change = cashReceived ? parseFloat(cashReceived) - totalAmount : 0;
-
-  const quickAmounts = [
-    totalAmount,           // Exact amount
-    totalAmount + 5,       // $5 more
-    totalAmount + 10,      // $10 more
-    totalAmount + 20,      // $20 more
-  ];
-
   const handleQuickUpdate = () => {
     if (currentSavedSale) {
       onSaveSale(currentSavedSale.clientName);
@@ -45,104 +33,97 @@ export function PaymentSection({
   };
 
   return (
-    <div className="mt-4 pt-4 border-t border-gray-700">
-      <div className="flex justify-between mb-4">
-        <span className="text-lg font-semibold text-white">Total:</span>
-        <span className="text-lg font-bold text-white">
-          ${totalAmount.toFixed(2)}
-        </span>
-      </div>
+    <div className="mt-4 space-y-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            className={`flex-1 ${
+              paymentMethod === "efectivo" ? "bg-primary text-primary-foreground" : ""
+            }`}
+            onClick={() => setPaymentMethod("efectivo")}
+          >
+            Efectivo
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className={`flex-1 ${
+              paymentMethod === "tarjeta" ? "bg-primary text-primary-foreground" : ""
+            }`}
+            onClick={() => setPaymentMethod("tarjeta")}
+          >
+            Tarjeta
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            className={`flex-1 ${
+              paymentMethod === "yappy" ? "bg-primary text-primary-foreground" : ""
+            }`}
+            onClick={() => setPaymentMethod("yappy")}
+          >
+            Yappy
+          </Button>
+        </div>
 
-      <div className="mb-4">
-        <h3 className="text-white mb-2">Payment Method</h3>
-        <RadioGroup
-          value={paymentMethod}
-          onValueChange={setPaymentMethod}
-          className="gap-4"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="efectivo" id="efectivo" />
-            <Label htmlFor="efectivo" className="text-white">Efectivo</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="tarjeta" id="tarjeta" />
-            <Label htmlFor="tarjeta" className="text-white">Tarjeta</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="yappy" id="yappy" />
-            <Label htmlFor="yappy" className="text-white">Yappy</Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      {paymentMethod === "efectivo" && (
-        <div className="mb-4 space-y-4">
-          <div>
-            <Label htmlFor="cashReceived" className="text-white">Cash Received</Label>
-            <Input
+        {paymentMethod === "efectivo" && (
+          <div className="space-y-2">
+            <label htmlFor="cashReceived" className="text-sm font-medium text-white">
+              Cash Received
+            </label>
+            <input
               id="cashReceived"
               type="number"
               value={cashReceived}
               onChange={(e) => setCashReceived(e.target.value)}
-              placeholder="Enter amount received"
-              className="mt-1"
+              className="w-full px-3 py-2 bg-background border border-input rounded-md"
+              placeholder="Enter amount"
             />
-            <div className="flex gap-2 mt-2">
-              {quickAmounts.map((amount) => (
-                <Button
-                  key={amount}
-                  variant="outline"
-                  onClick={() => setCashReceived(amount.toString())}
-                  className="flex-1"
-                >
-                  ${amount.toFixed(2)}
-                </Button>
-              ))}
-            </div>
-          </div>
-          {cashReceived && (
-            <div className="p-4 bg-card rounded-lg">
-              <div className="flex justify-between text-white">
-                <span>Change:</span>
-                <span className={change >= 0 ? "text-green-500" : "text-red-500"}>
-                  ${change.toFixed(2)}
+            {cashReceived && (
+              <div className="text-sm">
+                <span className="text-gray-400">Change: </span>
+                <span className="font-medium text-white">
+                  ${(Number(cashReceived) - totalAmount).toFixed(2)}
                 </span>
               </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="space-y-2">
-        <Button 
-          className="w-full" 
-          size="lg" 
-          onClick={handleCheckout}
-          disabled={!paymentMethod || (paymentMethod === "efectivo" && (!cashReceived || parseFloat(cashReceived) < totalAmount))}
-        >
-          Checkout
-        </Button>
-        
-        {cart.length > 0 && (
-          <div className="flex gap-2">
-            {currentSavedSale ? (
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={handleQuickUpdate}
-              >
-                <Save className="mr-2 h-4 w-4" />
-                Update Sale
-              </Button>
-            ) : (
-              <SaveSaleDialog
-                cart={cart}
-                total={totalAmount}
-                onSave={onSaveSale}
-                currentSavedSale={currentSavedSale}
-              />
             )}
           </div>
+        )}
+      </div>
+
+      <div className="flex gap-2">
+        <Button
+          className="w-full"
+          onClick={handleCheckout}
+          disabled={
+            !paymentMethod ||
+            (paymentMethod === "efectivo" &&
+              (!cashReceived || parseFloat(cashReceived) < totalAmount))
+          }
+        >
+          Checkout (${totalAmount.toFixed(2)})
+        </Button>
+      </div>
+
+      <div className="flex gap-2">
+        {currentSavedSale ? (
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleQuickUpdate}
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Update Sale for {currentSavedSale.clientName}
+          </Button>
+        ) : (
+          <SaveSaleDialog
+            cart={cart}
+            total={totalAmount}
+            onSave={onSaveSale}
+            currentSavedSale={currentSavedSale}
+          />
         )}
       </div>
     </div>
