@@ -2,6 +2,7 @@ import { Wine, DollarSign, Package, ShoppingCart } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { InventoryTable } from "@/components/InventoryTable";
 import { QuickAddForm } from "@/components/QuickAddForm";
+import { ArticleManager } from "@/components/ArticleManager";
 
 const mockInventory = [
   { id: 1, name: "Grey Goose Vodka", category: "Spirits", quantity: 5, threshold: 10 },
@@ -31,6 +32,11 @@ const Index = () => {
         <div>
           <h2 className="text-xl font-semibold text-white mb-4">Current Inventory</h2>
           <InventoryTable items={mockInventory} />
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-white mb-4">Article Management</h2>
+          <ArticleManager />
         </div>
       </div>
     </div>
