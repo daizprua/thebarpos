@@ -32,7 +32,7 @@ export function CartSection({
 
   return (
     <div className="lg:w-1/3">
-      <div className="bg-card/50 backdrop-blur-lg rounded-lg p-6 sticky top-8">
+      <div className="bg-card/80 backdrop-blur-lg rounded-lg p-6 sticky top-8 shadow-lg border border-gray-700/50 ring-1 ring-white/10">
         <div className="flex items-center gap-2 mb-4">
           <ShoppingCart className="h-6 w-6 text-white" />
           <h2 className="text-2xl font-bold text-white">Cart</h2>
