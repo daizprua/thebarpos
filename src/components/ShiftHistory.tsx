@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Shift, Sale, Expense } from "@/types/pos";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Trash2 } from "lucide-react";
 import {
   Collapsible,
   CollapsibleContent,
@@ -11,6 +11,7 @@ import {
 import { ShiftPaymentBreakdown } from "./shifts/ShiftPaymentBreakdown";
 import { ShiftExpenses } from "./shifts/ShiftExpenses";
 import { ShiftSummary } from "./shifts/ShiftSummary";
+import { Button } from "./ui/button";
 
 export function ShiftHistory() {
   const [shifts, setShifts] = useState<Shift[]>(() => {
@@ -76,14 +77,45 @@ export function ShiftHistory() {
     }
   };
 
+  const handleDeleteExpense = (shiftId: number, expenseId: number) => {
+    if (user?.role !== 'admin') return;
+
+    try {
+      const existingExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+      const updatedExpenses = existingExpenses.filter((expense: Expense) => expense.id !== expenseId);
+      localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
+      
+      toast({
+        title: "Expense Deleted",
+        description: "The expense has been deleted successfully.",
+      });
+      
+      // Force a re-render by updating the shifts state
+      setShifts([...shifts]);
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete expense. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Sort shifts by date in descending order
+  const sortedShifts = [...shifts].sort((a, b) => 
+    new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+  );
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold mb-6">Shift History</h1>
       <div className="space-y-4">
-        {shifts.map((shift) => {
+        {sortedShifts.map((shift, index) => {
           const shiftSales = getShiftSales(shift.id);
           const shiftExpenses = getShiftExpenses(shift.id);
           const totalSales = shiftSales.reduce((sum, sale) => sum + sale.total, 0);
+          const shiftNumber = sortedShifts.length - index;
 
           return (
             <Collapsible key={shift.id}>
@@ -93,7 +125,7 @@ export function ShiftHistory() {
                     <ChevronDown className="h-4 w-4" />
                     <div className="text-left">
                       <h3 className="text-lg font-semibold">
-                        {new Date(shift.startTime).toLocaleDateString()}
+                        Shift #{shiftNumber} - {new Date(shift.startTime).toLocaleDateString()}
                       </h3>
                       <p className="text-sm text-muted-foreground">
                         Started by: {shift.startedBy}
@@ -120,16 +152,22 @@ export function ShiftHistory() {
 
                     <ShiftPaymentBreakdown sales={shiftSales} />
                     
-                    <ShiftExpenses expenses={shiftExpenses} />
+                    <ShiftExpenses 
+                      expenses={shiftExpenses} 
+                      onDeleteExpense={(expenseId) => handleDeleteExpense(shift.id, expenseId)}
+                      isAdmin={user?.role === 'admin'}
+                    />
                     
                     {user?.role === 'admin' && shift.endTime && (
                       <div className="flex justify-end">
-                        <button
+                        <Button
+                          variant="destructive"
                           onClick={() => handleDeleteShift(shift.id)}
-                          className="text-red-500 hover:text-red-700"
+                          className="flex items-center gap-2"
                         >
+                          <Trash2 className="h-4 w-4" />
                           Delete Shift
-                        </button>
+                        </Button>
                       </div>
                     )}
                   </div>

@@ -15,15 +15,20 @@ interface ShiftPaymentBreakdownProps {
 const paymentMethodNames: { [key: string]: string } = {
   efectivo: "Cash",
   tarjeta: "Card",
-  yappy: "Yappy"
+  yappy: "Yappy",
+  cash: "Cash",
+  card: "Card"
 };
 
 export function ShiftPaymentBreakdown({ sales }: ShiftPaymentBreakdownProps) {
   const salesByPaymentMethod = sales.reduce((acc: { [key: string]: number }, sale) => {
-    const method = sale.paymentMethod || 'unknown';
-    acc[method] = (acc[method] || 0) + sale.total;
+    const methodKey = (sale.paymentMethod || '').toLowerCase().trim();
+    const methodName = paymentMethodNames[methodKey] || methodKey;
+    acc[methodName] = (acc[methodName] || 0) + sale.total;
     return acc;
   }, {});
+
+  if (Object.keys(salesByPaymentMethod).length === 0) return null;
 
   return (
     <div className="space-y-4">
@@ -38,7 +43,7 @@ export function ShiftPaymentBreakdown({ sales }: ShiftPaymentBreakdownProps) {
         <TableBody>
           {Object.entries(salesByPaymentMethod).map(([method, amount]) => (
             <TableRow key={method}>
-              <TableCell>{paymentMethodNames[method] || method}</TableCell>
+              <TableCell className="capitalize">{method}</TableCell>
               <TableCell className="text-right">
                 ${amount.toFixed(2)}
               </TableCell>
