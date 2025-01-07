@@ -7,6 +7,16 @@ import { ExcelImport } from "@/components/ExcelImport";
 import { MainNav } from "@/components/MainNav";
 import { useState } from "react";
 
+interface InventoryItem {
+  id: number;
+  name: string;
+  category: string;
+  quantity: number;
+  threshold: number;
+  price: number;
+  imageUrl?: string;
+}
+
 const initialInventory = [
   { id: 1, name: "Grey Goose Vodka", category: "Spirits", quantity: 5, threshold: 10, price: 29.99 },
   { id: 2, name: "Heineken", category: "Beer", quantity: 48, threshold: 24, price: 2.49 },
@@ -21,10 +31,20 @@ const Index = () => {
     setInventory(inventory.filter(item => item.id !== id));
   };
 
-  const handleUpdateItem = (updatedItem: typeof initialInventory[0]) => {
+  const handleUpdateItem = (updatedItem: InventoryItem) => {
     setInventory(inventory.map(item => 
       item.id === updatedItem.id ? updatedItem : item
     ));
+  };
+
+  const handleAddItem = (newItem: Omit<InventoryItem, 'id' | 'threshold'>) => {
+    const newId = Math.max(...inventory.map(item => item.id), 0) + 1;
+    const itemWithDefaults: InventoryItem = {
+      ...newItem,
+      id: newId,
+      threshold: 10, // Default threshold
+    };
+    setInventory([...inventory, itemWithDefaults]);
   };
 
   const handleImportItems = (importedItems: typeof initialInventory) => {
@@ -49,7 +69,7 @@ const Index = () => {
             <StatsCard title="Total Items" value={inventory.length.toString()} icon={<Package />} />
             <StatsCard 
               title="Low Stock Items" 
-              value={inventory.filter(item => item.quantity <= item.threshold).length.toString()} 
+              value={inventory.filter(item => item.quantity <= (item.threshold || 10)).length.toString()} 
               icon={<ShoppingCart />} 
             />
             <StatsCard title="Value in Stock" value={`$${calculateTotalValue().toFixed(2)}`} icon={<DollarSign />} />
@@ -62,17 +82,17 @@ const Index = () => {
           </div>
 
           <div>
+            <h2 className="text-xl font-semibold text-white mb-4">Article Management</h2>
+            <ArticleManager onSaveArticle={handleAddItem} />
+          </div>
+
+          <div>
             <h2 className="text-xl font-semibold text-white mb-4">Current Inventory</h2>
             <InventoryTable 
               items={inventory} 
               onDeleteItem={handleDeleteItem}
               onUpdateItem={handleUpdateItem}
             />
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-4">Article Management</h2>
-            <ArticleManager />
           </div>
         </div>
       </div>
