@@ -42,7 +42,7 @@ export const ExcelImport = ({ onImport }: ExcelImportProps) => {
           id: Date.now() + index,
           name: item.name || item.Name || "",
           category: category,
-          quantity: Number(item.quantity || item.Quantity || 0),
+          quantity: Number(item.stock || item.Stock || 0), // Changed from quantity to stock
           threshold: Number(item.threshold || item.Threshold || 5),
           price: Number(item.price || item.Price || 0),
         };
