@@ -47,6 +47,13 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
           <Card key={product.id} className="bg-card/50 backdrop-blur-lg border-0">
             <CardContent className="p-4">
               <div className="flex flex-col gap-2">
+                {product.imageUrl && (
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-32 object-cover rounded-md mb-2"
+                  />
+                )}
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-semibold text-white">{product.name}</h3>

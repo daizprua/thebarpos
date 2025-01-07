@@ -2,7 +2,7 @@ import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, Upload } from "lucide-react";
 
 interface InventoryItem {
   id: number;
@@ -37,22 +37,43 @@ export const InventoryTableRow = ({
   onInputChange,
   getStockStatus,
 }: InventoryTableRowProps) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onInputChange('imageUrl', reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   if (editingId === item.id) {
     return (
       <TableRow>
         <TableCell>
-          {item.imageUrl && (
-            <img
-              src={item.imageUrl}
-              alt={item.name}
-              className="w-10 h-10 rounded object-cover mb-2"
+          <div className="space-y-2">
+            {editForm?.imageUrl && (
+              <img
+                src={editForm.imageUrl}
+                alt={editForm.name}
+                className="w-16 h-16 rounded object-cover"
+              />
+            )}
+            <div className="flex items-center gap-2">
+              <Input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="max-w-[200px]"
+              />
+            </div>
+            <Input
+              value={editForm?.name}
+              onChange={(e) => onInputChange('name', e.target.value)}
+              className="max-w-[200px]"
             />
-          )}
-          <Input
-            value={editForm?.name}
-            onChange={(e) => onInputChange('name', e.target.value)}
-            className="max-w-[200px]"
-          />
+          </div>
         </TableCell>
         <TableCell>
           <Input
@@ -93,14 +114,16 @@ export const InventoryTableRow = ({
   return (
     <TableRow>
       <TableCell className="font-medium text-white">
-        {item.imageUrl && (
-          <img
-            src={item.imageUrl}
-            alt={item.name}
-            className="w-10 h-10 rounded object-cover mb-2"
-          />
-        )}
-        {item.name}
+        <div className="flex items-center gap-2">
+          {item.imageUrl && (
+            <img
+              src={item.imageUrl}
+              alt={item.name}
+              className="w-10 h-10 rounded object-cover"
+            />
+          )}
+          <span>{item.name}</span>
+        </div>
       </TableCell>
       <TableCell className="text-gray-300">{item.category}</TableCell>
       <TableCell className="text-gray-300">{item.quantity}</TableCell>

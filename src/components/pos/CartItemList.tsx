@@ -36,11 +36,20 @@ export function CartItemList({
             key={item.id}
             className="flex items-start justify-between py-4 border-b border-gray-700"
           >
-            <div className="flex-1">
-              <h3 className="font-medium text-white">{item.name}</h3>
-              <p className="text-sm text-gray-400">
-                ${item.price.toFixed(2)} x {item.quantity}
-              </p>
+            <div className="flex gap-3 flex-1">
+              {item.imageUrl && (
+                <img
+                  src={item.imageUrl}
+                  alt={item.name}
+                  className="w-12 h-12 rounded object-cover"
+                />
+              )}
+              <div>
+                <h3 className="font-medium text-white">{item.name}</h3>
+                <p className="text-sm text-gray-400">
+                  ${item.price.toFixed(2)} x {item.quantity}
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
