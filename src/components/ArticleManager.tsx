@@ -1,30 +1,43 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ImagePlus, Save, Pencil } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { Save, Pencil } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface Article {
   id: number;
-  title: string;
-  content: string;
-  imageUrl: string;
+  name: string;
+  category: string;
+  quantity: number;
+  price: number;
 }
 
 export const ArticleManager = () => {
   const [articles, setArticles] = useState<Article[]>([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [imageUrl, setImageUrl] = useState("https://images.unsplash.com/photo-1649972904349-6e44c42644a7");
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [price, setPrice] = useState("");
   const [editingId, setEditingId] = useState<number | null>(null);
   const { toast } = useToast();
 
   const handleSave = () => {
-    if (!title || !content) {
+    if (!name || !category || !quantity || !price) {
       toast({
         title: "Missing Fields",
         description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const numericQuantity = parseInt(quantity);
+    const numericPrice = parseFloat(price);
+
+    if (isNaN(numericQuantity) || isNaN(numericPrice)) {
+      toast({
+        title: "Invalid Input",
+        description: "Quantity and price must be valid numbers",
         variant: "destructive",
       });
       return;
@@ -34,7 +47,7 @@ export const ArticleManager = () => {
       // Update existing article
       setArticles(articles.map(article => 
         article.id === editingId 
-          ? { ...article, title, content, imageUrl }
+          ? { ...article, name, category, quantity: numericQuantity, price: numericPrice }
           : article
       ));
       setEditingId(null);
@@ -46,9 +59,10 @@ export const ArticleManager = () => {
       // Create new article
       const newArticle: Article = {
         id: articles.length + 1,
-        title,
-        content,
-        imageUrl,
+        name,
+        category,
+        quantity: numericQuantity,
+        price: numericPrice,
       };
       setArticles([...articles, newArticle]);
       toast({
@@ -58,15 +72,17 @@ export const ArticleManager = () => {
     }
 
     // Reset form
-    setTitle("");
-    setContent("");
-    setImageUrl("https://images.unsplash.com/photo-1649972904349-6e44c42644a7");
+    setName("");
+    setCategory("");
+    setQuantity("");
+    setPrice("");
   };
 
   const handleEdit = (article: Article) => {
-    setTitle(article.title);
-    setContent(article.content);
-    setImageUrl(article.imageUrl);
+    setName(article.name);
+    setCategory(article.category);
+    setQuantity(article.quantity.toString());
+    setPrice(article.price.toString());
     setEditingId(article.id);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -74,44 +90,38 @@ export const ArticleManager = () => {
   return (
     <div className="space-y-6">
       <div className="rounded-lg border bg-card backdrop-blur-lg p-6 space-y-4">
-        <h3 className="text-lg font-semibold text-white">
+        <h3 className="text-lg font-semibold text-white mb-2">
           {editingId ? "Edit Article" : "Create New Article"}
         </h3>
         <div className="space-y-4">
           <Input
-            placeholder="Article Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             className="bg-background/50 text-white"
           />
-          <Textarea
-            placeholder="Article Content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="bg-background/50 text-white min-h-[120px]"
+          <Input
+            placeholder="Category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="bg-background/50 text-white"
+          />
+          <Input
+            type="number"
+            placeholder="Quantity"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            className="bg-background/50 text-white"
+          />
+          <Input
+            type="number"
+            step="0.01"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="bg-background/50 text-white"
           />
           <div className="flex gap-4">
-            <Button
-              className="bg-secondary hover:bg-secondary/80"
-              onClick={() => document.getElementById("imageInput")?.click()}
-            >
-              <ImagePlus className="mr-2" />
-              Add Image
-            </Button>
-            <input
-              id="imageInput"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => {
-                if (e.target.files?.[0]) {
-                  toast({
-                    title: "Image Upload Simulated",
-                    description: "In a real app, this would upload to a server",
-                  });
-                }
-              }}
-            />
             <Button onClick={handleSave}>
               <Save className="mr-2" />
               {editingId ? "Update Article" : "Save Article"}
@@ -121,9 +131,10 @@ export const ArticleManager = () => {
                 variant="outline" 
                 onClick={() => {
                   setEditingId(null);
-                  setTitle("");
-                  setContent("");
-                  setImageUrl("https://images.unsplash.com/photo-1649972904349-6e44c42644a7");
+                  setName("");
+                  setCategory("");
+                  setQuantity("");
+                  setPrice("");
                 }}
               >
                 Cancel Edit
@@ -141,14 +152,11 @@ export const ArticleManager = () => {
               key={article.id}
               className="rounded-lg border bg-card backdrop-blur-lg overflow-hidden"
             >
-              <img
-                src={article.imageUrl}
-                alt={article.title}
-                className="w-full h-48 object-cover"
-              />
               <div className="p-4">
-                <h4 className="text-lg font-semibold text-white mb-2">{article.title}</h4>
-                <p className="text-gray-300 line-clamp-3 mb-4">{article.content}</p>
+                <h4 className="text-lg font-semibold text-white mb-2">{article.name}</h4>
+                <p className="text-gray-300 mb-1">Category: {article.category}</p>
+                <p className="text-gray-300 mb-1">Quantity: {article.quantity}</p>
+                <p className="text-gray-300 mb-4">Price: ${article.price.toFixed(2)}</p>
                 <Button 
                   variant="secondary" 
                   size="sm" 
