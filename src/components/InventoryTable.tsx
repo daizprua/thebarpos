@@ -112,7 +112,7 @@ export const InventoryTable = ({ items, onDeleteItem, onUpdateItem }: InventoryT
             <TableRow>
               <TableHead className="text-gray-400">Name</TableHead>
               <TableHead className="text-gray-400">Category</TableHead>
-              <TableHead className="text-gray-400">Quantity</TableHead>
+              <TableHead className="text-gray-400">Stock</TableHead>
               <TableHead className="text-gray-400">Price</TableHead>
               <TableHead className="text-gray-400">Status</TableHead>
               <TableHead className="text-gray-400">Actions</TableHead>

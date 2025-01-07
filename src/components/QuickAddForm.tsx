@@ -22,7 +22,7 @@ export const QuickAddForm = () => {
             <SelectItem value="mixers">Mixers</SelectItem>
           </SelectContent>
         </Select>
-        <Input type="number" placeholder="Quantity" className="bg-background/50 text-white" />
+        <Input type="number" placeholder="Stock" className="bg-background/50 text-white" />
         <Button className="bg-primary hover:bg-primary/90">Add Item</Button>
       </div>
     </div>
