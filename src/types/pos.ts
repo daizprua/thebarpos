@@ -15,4 +15,14 @@ export interface Sale {
   items: CartItem[];
   total: number;
   date: string;
+  shiftId: number;
+}
+
+export interface Shift {
+  id: number;
+  startTime: string;
+  endTime?: string;
+  initialCash: number;
+  totalSales: number;
+  numberOfTransactions: number;
 }

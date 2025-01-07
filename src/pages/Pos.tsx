@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { ProductsSection } from "@/components/pos/ProductsSection";
 import { CartSection } from "@/components/pos/CartSection";
+import { ShiftControls } from "@/components/pos/ShiftControls";
 import { Product, CartItem } from "@/types/pos";
-import { Button } from "@/components/ui/button";
-import { PlayCircle, StopCircle } from "lucide-react";
 
 const mockProducts: Product[] = [
   { id: 1, name: "Grey Goose Vodka", category: "Spirits", price: 29.99 },
@@ -28,10 +27,11 @@ const Pos = () => {
   });
   const { toast } = useToast();
 
-  const startShift = () => {
+  const startShift = (initialCash: number) => {
     const newShift = {
       startTime: new Date().toISOString(),
-      id: Date.now()
+      id: Date.now(),
+      initialCash
     };
     setActiveShift(newShift);
     localStorage.setItem('activeShift', JSON.stringify(newShift));
@@ -162,33 +162,11 @@ const Pos = () => {
     <div className="min-h-screen bg-[#1A1F2C]">
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              {!activeShift ? (
-                <Button 
-                  onClick={startShift}
-                  className="flex items-center gap-2"
-                >
-                  <PlayCircle className="h-4 w-4" />
-                  Start Shift
-                </Button>
-              ) : (
-                <Button 
-                  onClick={endShift}
-                  variant="destructive"
-                  className="flex items-center gap-2"
-                >
-                  <StopCircle className="h-4 w-4" />
-                  End Shift
-                </Button>
-              )}
-              {activeShift && (
-                <span className="text-white">
-                  Shift started: {new Date(activeShift.startTime).toLocaleTimeString()}
-                </span>
-              )}
-            </div>
-          </div>
+          <ShiftControls
+            activeShift={activeShift}
+            onStartShift={startShift}
+            onEndShift={endShift}
+          />
           <div className="flex flex-col lg:flex-row gap-8">
             <ProductsSection products={mockProducts} addToCart={addToCart} />
             <CartSection
