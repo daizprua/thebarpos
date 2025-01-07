@@ -1,4 +1,4 @@
-import { Wine, DollarSign, Package, ShoppingCart } from "lucide-react";
+import { Wine, Package, ShoppingCart } from "lucide-react";
 import { StatsCard } from "@/components/StatsCard";
 import { InventoryTable } from "@/components/InventoryTable";
 import { QuickAddForm } from "@/components/QuickAddForm";
@@ -26,7 +26,6 @@ const initialInventory = [
 const Index = () => {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
 
-  // Load inventory from localStorage on component mount
   useEffect(() => {
     const savedInventory = localStorage.getItem('inventory');
     if (savedInventory) {
@@ -82,15 +81,13 @@ const Index = () => {
             <p className="text-gray-400">Manage your inventory and track stock levels</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <StatsCard title="Total Items" value={inventory.length.toString()} icon={<Package />} />
             <StatsCard 
               title="Low Stock Items" 
               value={inventory.filter(item => item.quantity <= (item.threshold || 10)).length.toString()} 
               icon={<ShoppingCart />} 
             />
-            <StatsCard title="Value in Stock" value={`$${calculateTotalValue().toFixed(2)}`} icon={<DollarSign />} />
-            <StatsCard title="Items Sold Today" value="47" icon={<Wine />} />
           </div>
 
           <div className="flex justify-between items-center">
