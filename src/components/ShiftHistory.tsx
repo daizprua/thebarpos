@@ -82,6 +82,12 @@ export function ShiftHistory() {
     }
   };
 
+  const paymentMethodNames: { [key: string]: string } = {
+    efectivo: "Cash",
+    tarjeta: "Card",
+    yappy: "Yappy"
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold mb-6">Shift History</h1>
@@ -91,6 +97,13 @@ export function ShiftHistory() {
           const shiftExpenses = getShiftExpenses(shift.id);
           const totalSales = shiftSales.reduce((sum, sale) => sum + sale.total, 0);
           const totalExpenses = shiftExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+          // Group sales by payment method
+          const salesByPaymentMethod = shiftSales.reduce((acc: { [key: string]: number }, sale) => {
+            const method = sale.paymentMethod || 'unknown';
+            acc[method] = (acc[method] || 0) + sale.total;
+            return acc;
+          }, {});
 
           return (
             <Collapsible key={shift.id}>
@@ -134,7 +147,27 @@ export function ShiftHistory() {
                       </div>
                     </div>
 
-                    <ShiftPaymentBreakdown sales={shiftSales} />
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Sales by Payment Method</h4>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Payment Method</TableHead>
+                            <TableHead className="text-right">Amount</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {Object.entries(salesByPaymentMethod).map(([method, amount]) => (
+                            <TableRow key={method}>
+                              <TableCell>{paymentMethodNames[method] || method}</TableCell>
+                              <TableCell className="text-right">
+                                ${amount.toFixed(2)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
 
                     {shiftExpenses.length > 0 && (
                       <div className="space-y-4">
