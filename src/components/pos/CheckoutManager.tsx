@@ -1,6 +1,6 @@
 import { CartItem } from "@/types/pos";
 import { createSale, saveSale } from "@/utils/salesUtils";
-import { toast } from "sonner";
+import { toast } from "@/hooks/use-toast";
 
 interface CheckoutManagerProps {
   cart: CartItem[];
@@ -25,16 +25,18 @@ export const handleCheckout = ({
 }: CheckoutManagerProps) => (paymentMethod: string) => {
   if (!activeShift) {
     toast({
-      description: "Please start your shift before making sales.",
       variant: "destructive",
+      title: "Error",
+      description: "Please start your shift before making sales.",
     });
     return;
   }
 
   if (cart.length === 0) {
     toast({
-      description: "Cart is empty",
       variant: "destructive",
+      title: "Error",
+      description: "Cart is empty",
     });
     return;
   }
