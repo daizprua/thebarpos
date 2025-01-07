@@ -145,7 +145,8 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
   const canEndShift = activeShift && user?.role === 'admin';
 
   const handleDeleteShift = (shiftId: number) => {
-    if (!user?.role === 'admin') return;
+    // Fix the type comparison by checking if role exists and equals 'admin'
+    if (user?.role !== 'admin') return;
     
     const updatedShifts = shifts.filter(shift => shift.id !== shiftId);
     localStorage.setItem('shifts', JSON.stringify(updatedShifts));

@@ -94,6 +94,22 @@ export default function Statistics() {
     return expenses.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
   };
 
+  // Define chart configuration
+  const chartConfig = {
+    sales: {
+      color: '#4ade80',
+      label: 'Sales'
+    },
+    expenses: {
+      color: '#ef4444',
+      label: 'Expenses'
+    },
+    net: {
+      color: '#60a5fa',
+      label: 'Net'
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#1A1F2C] p-8">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -138,7 +154,7 @@ export default function Statistics() {
               </div>
 
               <Card className="p-6 backdrop-blur-lg bg-card border-none">
-                <ChartContainer className="h-[400px]">
+                <ChartContainer config={chartConfig} className="h-[400px]">
                   <BarChart data={getSalesData()} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" stroke="#ffffff" />
