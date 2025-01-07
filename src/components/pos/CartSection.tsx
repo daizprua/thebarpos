@@ -1,6 +1,7 @@
-import { ShoppingCart } from "lucide-react";
-import { CartItem, SavedSale } from "@/types/pos";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { SaveSaleDialog } from "./SaveSaleDialog";
+import { CartItem, SavedSale } from "@/types/pos";
 import { CartItemList } from "./CartItemList";
 import { PaymentSection } from "./PaymentSection";
 
@@ -9,11 +10,11 @@ interface CartSectionProps {
   updateQuantity: (productId: number, change: number) => void;
   removeFromCart: (productId: number) => void;
   getTotalAmount: () => number;
-  handleCheckout: () => void;
+  handleCheckout: (paymentMethod: string) => void;
   onSaveSale: (clientName: string) => void;
-  onDeleteSale?: (saleId: number) => void;
-  currentSavedSale?: SavedSale | null;
-  isAdmin?: boolean;
+  onDeleteSale: (saleId: number) => void;
+  currentSavedSale: SavedSale | null;
+  isAdmin: boolean;
 }
 
 export function CartSection({
@@ -25,56 +26,42 @@ export function CartSection({
   onSaveSale,
   onDeleteSale,
   currentSavedSale,
-  isAdmin,
+  isAdmin
 }: CartSectionProps) {
-  const [paymentMethod, setPaymentMethod] = useState<string>("efectivo");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [cashReceived, setCashReceived] = useState<string>("");
-  const itemsPerPage = 12;
-
-  const totalAmount = getTotalAmount();
-  const totalPages = Math.ceil(cart.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = cart.slice(startIndex, endIndex);
-
-  const handlePaymentAndCheckout = () => {
-    if (!paymentMethod) {
-      return;
-    }
-    handleCheckout();
-  };
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("cash");
 
   return (
-    <div className="lg:w-1/3">
-      <div className="bg-card/80 backdrop-blur-lg rounded-lg p-6 sticky top-8 shadow-lg border border-gray-700/50 ring-1 ring-white/10">
-        <div className="flex items-center gap-2 mb-4">
-          <ShoppingCart className="h-6 w-6 text-white" />
-          <h2 className="text-2xl font-bold text-white">Cart</h2>
+    <div className="w-full lg:w-1/3 bg-card/50 backdrop-blur-lg rounded-lg p-6 space-y-6 h-fit">
+      <h2 className="text-2xl font-bold">Cart</h2>
+      <CartItemList
+        cart={cart}
+        updateQuantity={updateQuantity}
+        removeFromCart={removeFromCart}
+      />
+      <div className="pt-4 border-t">
+        <div className="flex justify-between items-center mb-4">
+          <span className="text-lg font-semibold">Total:</span>
+          <span className="text-lg font-bold">${getTotalAmount().toFixed(2)}</span>
         </div>
-
-        <CartItemList
-          currentItems={currentItems}
-          updateQuantity={updateQuantity}
-          removeFromCart={removeFromCart}
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-        />
-
-        <PaymentSection
-          totalAmount={totalAmount}
-          paymentMethod={paymentMethod}
-          setPaymentMethod={setPaymentMethod}
-          cashReceived={cashReceived}
-          setCashReceived={setCashReceived}
-          handleCheckout={handlePaymentAndCheckout}
-          cart={cart}
-          onSaveSale={onSaveSale}
-          onDeleteSale={onDeleteSale}
-          currentSavedSale={currentSavedSale}
-          isAdmin={isAdmin}
-        />
+        <div className="space-y-4">
+          <PaymentSection
+            onPaymentMethodSelect={setSelectedPaymentMethod}
+            selectedMethod={selectedPaymentMethod}
+          />
+          <Button
+            className="w-full"
+            onClick={() => handleCheckout(selectedPaymentMethod)}
+            disabled={cart.length === 0}
+          >
+            Complete Sale
+          </Button>
+          <SaveSaleDialog
+            onSave={onSaveSale}
+            onDelete={onDeleteSale}
+            currentSavedSale={currentSavedSale}
+            isAdmin={isAdmin}
+          />
+        </div>
       </div>
     </div>
   );

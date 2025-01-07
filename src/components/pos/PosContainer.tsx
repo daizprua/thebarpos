@@ -169,7 +169,7 @@ export function PosContainer() {
     }
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = (paymentMethod: string) => {
     if (!activeShift) {
       toast({
         variant: "destructive",
@@ -192,7 +192,8 @@ export function PosContainer() {
       items: cart,
       total: getTotalAmount(),
       date: new Date().toISOString(),
-      shiftId: activeShift.id
+      shiftId: activeShift.id,
+      paymentMethod: paymentMethod // Add payment method to the sale
     };
 
     const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
