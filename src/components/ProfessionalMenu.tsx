@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Package, Store, BarChart, Home, Settings, LogOut, History, Receipt } from "lucide-react";
+import { Package, Store, BarChart, Home, Settings, LogOut, History, Receipt, Clock } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { ShiftHistory } from "./ShiftHistory";
 
 export function ProfessionalMenu() {
   const location = useLocation();
@@ -108,7 +107,17 @@ export function ProfessionalMenu() {
                     </Button>
                   );
                 case 'shifts':
-                  return <ShiftHistory key="shifts" />;
+                  return (
+                    <Button key="shifts" variant="ghost" asChild>
+                      <Link 
+                        to="/shifts" 
+                        className={`flex items-center gap-2 ${currentPath === "/shifts" ? "text-primary" : ""}`}
+                      >
+                        <Clock className="h-5 w-5" />
+                        <span>Shifts</span>
+                      </Link>
+                    </Button>
+                  );
                 case 'statistics':
                   return (
                     <Button key="statistics" variant="ghost" asChild>
