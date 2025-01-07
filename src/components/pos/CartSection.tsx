@@ -2,6 +2,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, ShoppingCart, X } from "lucide-react";
 import { CartItem } from "@/types/pos";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 
 interface CartSectionProps {
   cart: CartItem[];
@@ -18,6 +21,15 @@ export function CartSection({
   getTotalAmount,
   handleCheckout,
 }: CartSectionProps) {
+  const [paymentMethod, setPaymentMethod] = useState<string>("efectivo");
+
+  const handlePaymentAndCheckout = () => {
+    if (!paymentMethod) {
+      return;
+    }
+    handleCheckout();
+  };
+
   return (
     <div className="lg:w-1/3">
       <div className="bg-card/50 backdrop-blur-lg rounded-lg p-6 sticky top-8">
@@ -80,7 +92,35 @@ export function CartSection({
               ${getTotalAmount().toFixed(2)}
             </span>
           </div>
-          <Button className="w-full" size="lg" onClick={handleCheckout}>
+
+          <div className="mb-4">
+            <h3 className="text-white mb-2">Payment Method</h3>
+            <RadioGroup
+              value={paymentMethod}
+              onValueChange={setPaymentMethod}
+              className="gap-4"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="efectivo" id="efectivo" />
+                <Label htmlFor="efectivo" className="text-white">Efectivo</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="tarjeta" id="tarjeta" />
+                <Label htmlFor="tarjeta" className="text-white">Tarjeta</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="yappy" id="yappy" />
+                <Label htmlFor="yappy" className="text-white">Yappy</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <Button 
+            className="w-full" 
+            size="lg" 
+            onClick={handlePaymentAndCheckout}
+            disabled={!paymentMethod}
+          >
             Checkout
           </Button>
         </div>
