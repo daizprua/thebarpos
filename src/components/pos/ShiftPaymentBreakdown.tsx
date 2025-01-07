@@ -15,13 +15,14 @@ const formatPaymentMethod = (method: string): string => {
     'yappy': 'Yappy',
     'unknown': 'Unknown'
   };
-  return methodMap[method.toLowerCase()] || method;
+  return methodMap[method?.toLowerCase()] || method || 'Unknown';
 };
 
 export const calculatePaymentBreakdown = (sales: Sale[]) => {
   return sales.reduce((acc: { [key: string]: number }, sale) => {
-    const method = formatPaymentMethod(sale.paymentMethod || 'unknown');
-    acc[method] = (acc[method] || 0) + sale.total;
+    const method = sale.paymentMethod?.toLowerCase() || 'unknown';
+    const formattedMethod = formatPaymentMethod(method);
+    acc[formattedMethod] = (acc[formattedMethod] || 0) + sale.total;
     return acc;
   }, {});
 };
