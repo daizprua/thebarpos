@@ -34,7 +34,7 @@ export function PaymentSection({
     ? parseFloat(cashReceived) - totalAmount
     : 0;
 
-  const quickPaymentAmounts = [5, 10, 20, totalAmount];
+  const quickPaymentAmounts = [totalAmount, 5, 10, 20];
   const handleQuickPayment = (amount: number) => {
     setCashReceived(amount.toFixed(2));
   };
