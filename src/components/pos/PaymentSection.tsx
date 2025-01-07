@@ -34,9 +34,9 @@ export function PaymentSection({
     ? parseFloat(cashReceived) - totalAmount
     : 0;
 
-  const quickPaymentAmounts = [5, 10, 20];
+  const quickPaymentAmounts = [5, 10, 20, totalAmount];
   const handleQuickPayment = (amount: number) => {
-    setCashReceived(amount.toString());
+    setCashReceived(amount.toFixed(2));
   };
 
   return (
@@ -73,7 +73,7 @@ export function PaymentSection({
 
         {paymentMethod === "efectivo" && (
           <div className="space-y-2">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {quickPaymentAmounts.map((amount) => (
                 <Button
                   key={amount}
@@ -81,7 +81,7 @@ export function PaymentSection({
                   onClick={() => handleQuickPayment(amount)}
                   className="w-full"
                 >
-                  ${amount}
+                  ${amount.toFixed(2)}
                 </Button>
               ))}
             </div>
