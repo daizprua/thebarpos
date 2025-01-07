@@ -28,10 +28,10 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
+      <BrowserRouter>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
           {user && <ProfessionalMenu />}
           <Routes>
             <Route path="/" element={user ? (
@@ -42,8 +42,8 @@ const App = () => {
             <Route path="/inventory" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/control-panel" element={<ProtectedRoute><ControlPanel /></ProtectedRoute>} />
           </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+        </TooltipProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };
