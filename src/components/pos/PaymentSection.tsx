@@ -2,6 +2,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SaveSaleDialog } from "./SaveSaleDialog";
+import { CartItem } from "@/types/pos";
 
 interface PaymentSectionProps {
   totalAmount: number;
@@ -10,6 +12,8 @@ interface PaymentSectionProps {
   cashReceived: string;
   setCashReceived: (value: string) => void;
   handleCheckout: () => void;
+  cart: CartItem[];
+  onSaveSale: (clientName: string) => void;
 }
 
 export function PaymentSection({
@@ -19,6 +23,8 @@ export function PaymentSection({
   cashReceived,
   setCashReceived,
   handleCheckout,
+  cart,
+  onSaveSale,
 }: PaymentSectionProps) {
   const change = cashReceived ? parseFloat(cashReceived) - totalAmount : 0;
 
@@ -98,14 +104,24 @@ export function PaymentSection({
         </div>
       )}
 
-      <Button 
-        className="w-full" 
-        size="lg" 
-        onClick={handleCheckout}
-        disabled={!paymentMethod || (paymentMethod === "efectivo" && (!cashReceived || parseFloat(cashReceived) < totalAmount))}
-      >
-        Checkout
-      </Button>
+      <div className="space-y-2">
+        <Button 
+          className="w-full" 
+          size="lg" 
+          onClick={handleCheckout}
+          disabled={!paymentMethod || (paymentMethod === "efectivo" && (!cashReceived || parseFloat(cashReceived) < totalAmount))}
+        >
+          Checkout
+        </Button>
+        
+        {cart.length > 0 && (
+          <SaveSaleDialog
+            cart={cart}
+            total={totalAmount}
+            onSave={onSaveSale}
+          />
+        )}
+      </div>
     </div>
   );
 }

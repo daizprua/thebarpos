@@ -10,6 +10,15 @@ export interface CartItem extends Product {
   quantity: number;
 }
 
+export interface SavedSale {
+  id: number;
+  clientName: string;
+  items: CartItem[];
+  total: number;
+  date: string;
+  shiftId: number;
+}
+
 export interface Sale {
   id: number;
   items: CartItem[];
@@ -17,6 +26,7 @@ export interface Sale {
   date: string;
   shiftId: number;
   paymentMethod: string;
+  clientName?: string;
 }
 
 export interface Expense {

@@ -10,6 +10,7 @@ interface CartSectionProps {
   removeFromCart: (productId: number) => void;
   getTotalAmount: () => number;
   handleCheckout: () => void;
+  onSaveSale: (clientName: string) => void;
 }
 
 export function CartSection({
@@ -18,6 +19,7 @@ export function CartSection({
   removeFromCart,
   getTotalAmount,
   handleCheckout,
+  onSaveSale,
 }: CartSectionProps) {
   const [paymentMethod, setPaymentMethod] = useState<string>("efectivo");
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,6 +63,8 @@ export function CartSection({
           cashReceived={cashReceived}
           setCashReceived={setCashReceived}
           handleCheckout={handlePaymentAndCheckout}
+          cart={cart}
+          onSaveSale={onSaveSale}
         />
       </div>
     </div>

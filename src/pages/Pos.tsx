@@ -3,7 +3,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ProductsSection } from "@/components/pos/ProductsSection";
 import { CartSection } from "@/components/pos/CartSection";
 import { ShiftControls } from "@/components/pos/ShiftControls";
-import { Product, CartItem, Shift } from "@/types/pos";
+import { Product, CartItem, SavedSale } from "@/types/pos";
 
 const Pos = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -17,7 +17,6 @@ const Pos = () => {
   });
   const { toast } = useToast();
 
-  // Load inventory items as products
   useEffect(() => {
     const inventoryItems = JSON.parse(localStorage.getItem('inventory') || '[]');
     const mappedProducts: Product[] = inventoryItems.map((item: any) => ({
@@ -137,6 +136,28 @@ const Pos = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
+  const handleSaveSale = (clientName: string) => {
+    if (!activeShift) return;
+    
+    const savedSale: SavedSale = {
+      id: Date.now(),
+      clientName,
+      items: cart,
+      total: getTotalAmount(),
+      date: new Date().toISOString(),
+      shiftId: activeShift.id,
+    };
+
+    const savedSales = JSON.parse(localStorage.getItem('savedSales') || '[]');
+    localStorage.setItem('savedSales', JSON.stringify([...savedSales, savedSale]));
+
+    toast({
+      title: "Sale Saved",
+      description: `Sale saved for ${clientName}`,
+    });
+    setCart([]);
+  };
+
   const handleCheckout = () => {
     if (!activeShift) {
       toast({
@@ -190,6 +211,7 @@ const Pos = () => {
               removeFromCart={removeFromCart}
               getTotalAmount={getTotalAmount}
               handleCheckout={handleCheckout}
+              onSaveSale={handleSaveSale}
             />
           </div>
         </div>
