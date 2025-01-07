@@ -7,6 +7,7 @@ import { ProfessionalMenu } from "@/components/ProfessionalMenu";
 import Index from "./pages/Index";
 import Pos from "./pages/Pos";
 import Statistics from "./pages/Statistics";
+import ControlPanel from "./pages/ControlPanel";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/pos" element={<Pos />} />
           <Route path="/statistics" element={<Statistics />} />
           <Route path="/inventory" element={<Index />} />
+          <Route path="/control-panel" element={<ControlPanel />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

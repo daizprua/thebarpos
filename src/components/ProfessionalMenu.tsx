@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Package, Store, BarChart, Home } from "lucide-react";
+import { Package, Store, BarChart, Home, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export function ProfessionalMenu() {
@@ -48,6 +48,16 @@ export function ProfessionalMenu() {
               >
                 <Package className="h-5 w-5" />
                 <span>Inventory</span>
+              </Link>
+            </Button>
+
+            <Button variant="ghost" asChild>
+              <Link 
+                to="/control-panel" 
+                className={`flex items-center gap-2 ${currentPath === "/control-panel" ? "text-primary" : ""}`}
+              >
+                <Settings className="h-5 w-5" />
+                <span>Control Panel</span>
               </Link>
             </Button>
           </div>
