@@ -1,9 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Product } from "@/types/pos";
 import { Link } from "react-router-dom";
-import { Package } from "lucide-react";
+import { Package, Search } from "lucide-react";
+import { useState } from "react";
 
 interface ProductsSectionProps {
   products: Product[];
@@ -11,6 +13,12 @@ interface ProductsSectionProps {
 }
 
 export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="flex-1">
       <div className="flex justify-between items-center mb-4">
@@ -22,8 +30,20 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
           </Link>
         </Button>
       </div>
+
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search products..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-9 w-full bg-card/50 backdrop-blur-lg border-0"
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <Card key={product.id} className="bg-card/50 backdrop-blur-lg border-0">
             <CardContent className="p-4">
               <div className="flex flex-col gap-2">
