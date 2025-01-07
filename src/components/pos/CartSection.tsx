@@ -5,7 +5,6 @@ import { CartItem } from "@/types/pos";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
 import {
   Pagination,
   PaginationContent,
@@ -31,7 +30,6 @@ export function CartSection({
   handleCheckout,
 }: CartSectionProps) {
   const [paymentMethod, setPaymentMethod] = useState<string>("efectivo");
-  const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
 
@@ -42,14 +40,10 @@ export function CartSection({
     handleCheckout();
   };
 
-  const filteredCart = cart.filter((item) =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredCart.length / itemsPerPage);
+  const totalPages = Math.ceil(cart.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = filteredCart.slice(startIndex, endIndex);
+  const currentItems = cart.slice(startIndex, endIndex);
 
   return (
     <div className="lg:w-1/3">
@@ -57,16 +51,6 @@ export function CartSection({
         <div className="flex items-center gap-2 mb-4">
           <ShoppingCart className="h-6 w-6 text-white" />
           <h2 className="text-2xl font-bold text-white">Cart</h2>
-        </div>
-
-        <div className="mb-4">
-          <Input
-            type="search"
-            placeholder="Search items..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
-          />
         </div>
 
         <ScrollArea className="h-[400px] pr-4">
