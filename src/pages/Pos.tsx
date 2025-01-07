@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ProductsSection } from "@/components/pos/ProductsSection";
 import { CartSection } from "@/components/pos/CartSection";
 import { ShiftControls } from "@/components/pos/ShiftControls";
-import { Product, CartItem } from "@/types/pos";
+import { Product, CartItem, Shift } from "@/types/pos";
 
 const mockProducts: Product[] = [
   { id: 1, name: "Grey Goose Vodka", category: "Spirits", price: 29.99 },
@@ -29,12 +29,19 @@ const Pos = () => {
 
   const startShift = (initialCash: number) => {
     const newShift = {
-      startTime: new Date().toISOString(),
       id: Date.now(),
-      initialCash
+      startTime: new Date().toISOString(),
+      initialCash,
+      totalSales: 0,
+      numberOfTransactions: 0
     };
     setActiveShift(newShift);
     localStorage.setItem('activeShift', JSON.stringify(newShift));
+    
+    // Add the new shift to shifts array
+    const existingShifts = JSON.parse(localStorage.getItem('shifts') || '[]');
+    localStorage.setItem('shifts', JSON.stringify([...existingShifts, newShift]));
+    
     toast({
       title: "Shift Started",
       description: "Your work shift has begun.",
@@ -53,16 +60,21 @@ const Pos = () => {
     
     const shiftTotal = shiftSales.reduce((acc: number, sale: any) => acc + sale.total, 0);
     
-    const shiftRecord = {
-      ...activeShift,
-      endTime: new Date().toISOString(),
-      totalSales: shiftTotal,
-      numberOfTransactions: shiftSales.length
-    };
-
+    // Update the shift record in the shifts array
     const existingShifts = JSON.parse(localStorage.getItem('shifts') || '[]');
-    localStorage.setItem('shifts', JSON.stringify([...existingShifts, shiftRecord]));
+    const updatedShifts = existingShifts.map((shift: Shift) => {
+      if (shift.id === activeShift.id) {
+        return {
+          ...shift,
+          endTime: new Date().toISOString(),
+          totalSales: shiftTotal,
+          numberOfTransactions: shiftSales.length
+        };
+      }
+      return shift;
+    });
     
+    localStorage.setItem('shifts', JSON.stringify(updatedShifts));
     localStorage.removeItem('activeShift');
     setActiveShift(null);
     

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlayCircle, StopCircle, History } from "lucide-react";
@@ -31,6 +31,21 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
       return [];
     }
   });
+
+  // Update shifts state when localStorage changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        const savedShifts = JSON.parse(localStorage.getItem('shifts') || '[]');
+        setShifts(Array.isArray(savedShifts) ? savedShifts : []);
+      } catch {
+        setShifts([]);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   const handleStartShift = () => {
     const amount = parseFloat(initialCash);
