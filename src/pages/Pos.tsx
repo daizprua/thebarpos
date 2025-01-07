@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ProductsSection } from "@/components/pos/ProductsSection";
 import { CartSection } from "@/components/pos/CartSection";
 import { Product, CartItem } from "@/types/pos";
+import { Button } from "@/components/ui/button";
+import { PlayCircle, StopCircle } from "lucide-react";
 
 const mockProducts: Product[] = [
   { id: 1, name: "Grey Goose Vodka", category: "Spirits", price: 29.99 },
@@ -17,9 +19,69 @@ const mockProducts: Product[] = [
 
 const Pos = () => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [activeShift, setActiveShift] = useState<{
+    startTime: string;
+    id: number;
+  } | null>(() => {
+    const saved = localStorage.getItem('activeShift');
+    return saved ? JSON.parse(saved) : null;
+  });
   const { toast } = useToast();
 
+  const startShift = () => {
+    const newShift = {
+      startTime: new Date().toISOString(),
+      id: Date.now()
+    };
+    setActiveShift(newShift);
+    localStorage.setItem('activeShift', JSON.stringify(newShift));
+    toast({
+      title: "Shift Started",
+      description: "Your work shift has begun.",
+    });
+  };
+
+  const endShift = () => {
+    if (!activeShift) return;
+    
+    const shiftSales = JSON.parse(localStorage.getItem('sales') || '[]')
+      .filter((sale: any) => {
+        const saleDate = new Date(sale.date);
+        const shiftStart = new Date(activeShift.startTime);
+        return saleDate >= shiftStart;
+      });
+    
+    const shiftTotal = shiftSales.reduce((acc: number, sale: any) => acc + sale.total, 0);
+    
+    const shiftRecord = {
+      ...activeShift,
+      endTime: new Date().toISOString(),
+      totalSales: shiftTotal,
+      numberOfTransactions: shiftSales.length
+    };
+
+    const existingShifts = JSON.parse(localStorage.getItem('shifts') || '[]');
+    localStorage.setItem('shifts', JSON.stringify([...existingShifts, shiftRecord]));
+    
+    localStorage.removeItem('activeShift');
+    setActiveShift(null);
+    
+    toast({
+      title: "Shift Ended",
+      description: `Total sales: $${shiftTotal.toFixed(2)} | Transactions: ${shiftSales.length}`,
+    });
+  };
+
   const addToCart = (product: Product) => {
+    if (!activeShift) {
+      toast({
+        variant: "destructive",
+        title: "No Active Shift",
+        description: "Please start your shift before making sales.",
+      });
+      return;
+    }
+
     setCart((currentCart) => {
       const existingItem = currentCart.find((item) => item.id === product.id);
       if (existingItem) {
@@ -61,6 +123,15 @@ const Pos = () => {
   };
 
   const handleCheckout = () => {
+    if (!activeShift) {
+      toast({
+        variant: "destructive",
+        title: "No Active Shift",
+        description: "Please start your shift before making sales.",
+      });
+      return;
+    }
+
     if (cart.length === 0) {
       toast({
         description: "Cart is empty",
@@ -69,14 +140,15 @@ const Pos = () => {
       return;
     }
 
-    // Save the sale to localStorage
-    const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
     const newSale = {
       id: Date.now(),
       items: cart,
       total: getTotalAmount(),
-      date: new Date().toISOString()
+      date: new Date().toISOString(),
+      shiftId: activeShift.id
     };
+
+    const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
     localStorage.setItem('sales', JSON.stringify([...existingSales, newSale]));
 
     toast({
@@ -90,6 +162,33 @@ const Pos = () => {
     <div className="min-h-screen bg-[#1A1F2C]">
       <div className="p-8">
         <div className="max-w-7xl mx-auto space-y-8">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              {!activeShift ? (
+                <Button 
+                  onClick={startShift}
+                  className="flex items-center gap-2"
+                >
+                  <PlayCircle className="h-4 w-4" />
+                  Start Shift
+                </Button>
+              ) : (
+                <Button 
+                  onClick={endShift}
+                  variant="destructive"
+                  className="flex items-center gap-2"
+                >
+                  <StopCircle className="h-4 w-4" />
+                  End Shift
+                </Button>
+              )}
+              {activeShift && (
+                <span className="text-white">
+                  Shift started: {new Date(activeShift.startTime).toLocaleTimeString()}
+                </span>
+              )}
+            </div>
+          </div>
           <div className="flex flex-col lg:flex-row gap-8">
             <ProductsSection products={mockProducts} addToCart={addToCart} />
             <CartSection
