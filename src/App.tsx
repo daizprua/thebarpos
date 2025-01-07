@@ -7,7 +7,6 @@ import { ProfessionalMenu } from "@/components/ProfessionalMenu";
 import Index from "./pages/Index";
 import Pos from "./pages/Pos";
 import Statistics from "./pages/Statistics";
-import { InventoryTable } from "./components/InventoryTable";
 
 const queryClient = new QueryClient();
 
@@ -22,7 +21,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/pos" element={<Pos />} />
           <Route path="/statistics" element={<Statistics />} />
-          <Route path="/inventory" element={<InventoryTable items={[]} />} />
+          <Route path="/inventory" element={<Index />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
