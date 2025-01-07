@@ -35,6 +35,11 @@ export function ExpenseForm({ shiftId, onAddExpense }: ExpenseFormProps) {
       date: new Date().toISOString(),
     };
 
+    // Save to localStorage
+    const existingExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+    const updatedExpenses = [...existingExpenses, expense];
+    localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
+
     onAddExpense(expense);
     setDescription("");
     setAmount("");
