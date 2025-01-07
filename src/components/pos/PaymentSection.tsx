@@ -34,6 +34,11 @@ export function PaymentSection({
     ? parseFloat(cashReceived) - totalAmount
     : 0;
 
+  const quickPaymentAmounts = [5, 10, 20];
+  const handleQuickPayment = (amount: number) => {
+    setCashReceived(amount.toString());
+  };
+
   return (
     <div className="mt-6 space-y-4">
       <div className="flex justify-between text-lg font-semibold text-white">
@@ -68,6 +73,18 @@ export function PaymentSection({
 
         {paymentMethod === "efectivo" && (
           <div className="space-y-2">
+            <div className="grid grid-cols-3 gap-2">
+              {quickPaymentAmounts.map((amount) => (
+                <Button
+                  key={amount}
+                  variant="outline"
+                  onClick={() => handleQuickPayment(amount)}
+                  className="w-full"
+                >
+                  ${amount}
+                </Button>
+              ))}
+            </div>
             <Input
               type="number"
               placeholder="Cash received"
