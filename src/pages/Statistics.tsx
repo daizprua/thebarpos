@@ -1,206 +1,154 @@
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
+import { useEffect, useState } from "react";
 import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import {
-  BarChart,
-  Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-type TimeRange = "daily" | "weekly" | "monthly" | "yearly";
+const Statistics = () => {
+  const [salesData, setSalesData] = useState([]);
+  const [expensesData, setExpensesData] = useState([]);
 
-export default function Statistics() {
-  const [timeRange, setTimeRange] = useState<TimeRange>("daily");
-  const [activeTab, setActiveTab] = useState("sales");
+  useEffect(() => {
+    // Load sales data
+    const sales = JSON.parse(localStorage.getItem("sales") || "[]");
+    const expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
 
-  const getSalesData = () => {
-    const sales = JSON.parse(localStorage.getItem('sales') || '[]');
-    const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-    
-    const groupedData: { [key: string]: { sales: number; expenses: number } } = {};
-    
-    sales.forEach((sale: any) => {
-      const date = new Date(sale.date);
-      let key = '';
-      
-      switch (timeRange) {
-        case 'daily':
-          key = date.toLocaleDateString();
-          break;
-        case 'weekly':
-          const weekNum = Math.ceil((date.getDate() + 6 - date.getDay()) / 7);
-          key = `Week ${weekNum}`;
-          break;
-        case 'monthly':
-          key = date.toLocaleString('default', { month: 'short' });
-          break;
-        case 'yearly':
-          key = date.getFullYear().toString();
-          break;
-      }
-      
-      if (!groupedData[key]) {
-        groupedData[key] = { sales: 0, expenses: 0 };
-      }
-      groupedData[key].sales += sale.total;
-    });
-    
-    expenses.forEach((expense: any) => {
-      const date = new Date(expense.date);
-      let key = '';
-      
-      switch (timeRange) {
-        case 'daily':
-          key = date.toLocaleDateString();
-          break;
-        case 'weekly':
-          const weekNum = Math.ceil((date.getDate() + 6 - date.getDay()) / 7);
-          key = `Week ${weekNum}`;
-          break;
-        case 'monthly':
-          key = date.toLocaleString('default', { month: 'short' });
-          break;
-        case 'yearly':
-          key = date.getFullYear().toString();
-          break;
-      }
-      
-      if (!groupedData[key]) {
-        groupedData[key] = { sales: 0, expenses: 0 };
-      }
-      groupedData[key].expenses += expense.amount;
-    });
-    
-    return Object.entries(groupedData).map(([name, data]) => ({
-      name,
-      sales: data.sales,
-      expenses: data.expenses,
-      net: data.sales - data.expenses,
+    // Process sales data
+    const processedSales = processSalesData(sales);
+    setSalesData(processedSales);
+
+    // Process expenses data
+    const processedExpenses = processExpensesData(expenses);
+    setExpensesData(processedExpenses);
+  }, []);
+
+  const processSalesData = (sales) => {
+    const dailySales = sales.reduce((acc, sale) => {
+      const date = new Date(sale.date).toLocaleDateString();
+      acc[date] = (acc[date] || 0) + sale.total;
+      return acc;
+    }, {});
+
+    return Object.entries(dailySales).map(([date, total]) => ({
+      date,
+      total,
     }));
   };
 
-  const getExpenseHistory = () => {
-    const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-    return expenses.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const processExpensesData = (expenses) => {
+    const dailyExpenses = expenses.reduce((acc, expense) => {
+      const date = new Date(expense.date).toLocaleDateString();
+      acc[date] = (acc[date] || 0) + expense.amount;
+      return acc;
+    }, {});
+
+    return Object.entries(dailyExpenses).map(([date, total]) => ({
+      date,
+      total,
+    }));
   };
 
-  // Define chart configuration
-  const chartConfig = {
-    sales: {
-      color: '#4ade80',
-      label: 'Sales'
-    },
-    expenses: {
-      color: '#ef4444',
-      label: 'Expenses'
-    },
-    net: {
-      color: '#60a5fa',
-      label: 'Net'
-    }
+  const calculateTotalSales = () => {
+    return salesData.reduce((total, day) => total + day.total, 0);
+  };
+
+  const calculateTotalExpenses = () => {
+    return expensesData.reduce((total, day) => total + day.total, 0);
   };
 
   return (
-    <div className="min-h-screen bg-[#1A1F2C] p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Statistics</h1>
-          <p className="text-gray-400">Track your sales and expenses over time</p>
-        </div>
+    <div className="container mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-8">Statistics</h1>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            <TabsTrigger value="sales">Sales & Expenses</TabsTrigger>
-            <TabsTrigger value="expenses">Expense History</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="sales">
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <Button
-                  variant={timeRange === "daily" ? "default" : "outline"}
-                  onClick={() => setTimeRange("daily")}
-                >
-                  Daily
-                </Button>
-                <Button
-                  variant={timeRange === "weekly" ? "default" : "outline"}
-                  onClick={() => setTimeRange("weekly")}
-                >
-                  Weekly
-                </Button>
-                <Button
-                  variant={timeRange === "monthly" ? "default" : "outline"}
-                  onClick={() => setTimeRange("monthly")}
-                >
-                  Monthly
-                </Button>
-                <Button
-                  variant={timeRange === "yearly" ? "default" : "outline"}
-                  onClick={() => setTimeRange("yearly")}
-                >
-                  Yearly
-                </Button>
-              </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-2">Total Sales</h3>
+          <p className="text-2xl font-bold">${calculateTotalSales().toFixed(2)}</p>
+        </Card>
 
-              <Card className="p-6 backdrop-blur-lg bg-card border-none">
-                <ChartContainer config={chartConfig} className="h-[400px]">
-                  <BarChart data={getSalesData()} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" stroke="#ffffff" />
-                    <YAxis stroke="#ffffff" />
-                    <Tooltip content={({ active, payload, label }) => (
-                      <ChartTooltipContent
-                        active={active}
-                        payload={payload}
-                        label={label}
-                      />
-                    )} />
-                    <Legend />
-                    <Bar dataKey="sales" name="Sales" fill="#4ade80" />
-                    <Bar dataKey="expenses" name="Expenses" fill="#ef4444" />
-                    <Bar dataKey="net" name="Net" fill="#60a5fa" />
-                  </BarChart>
-                </ChartContainer>
-              </Card>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="expenses">
-            <Card className="p-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Expense History</h3>
-                <div className="space-y-4">
-                  {getExpenseHistory().map((expense: any) => (
-                    <div key={expense.id} className="flex justify-between items-center p-4 border rounded-lg">
-                      <div>
-                        <p className="font-medium">{expense.description}</p>
-                        <p className="text-sm text-gray-500">
-                          {new Date(expense.date).toLocaleDateString()} {new Date(expense.date).toLocaleTimeString()}
-                        </p>
-                      </div>
-                      <p className="text-red-500 font-semibold">-${expense.amount.toFixed(2)}</p>
-                    </div>
-                  ))}
-                  {getExpenseHistory().length === 0 && (
-                    <p className="text-center text-gray-500">No expenses recorded</p>
-                  )}
-                </div>
-              </div>
-            </Card>
-          </TabsContent>
-        </Tabs>
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-2">Total Expenses</h3>
+          <p className="text-2xl font-bold text-red-500">
+            ${calculateTotalExpenses().toFixed(2)}
+          </p>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-2">Net Income</h3>
+          <p className="text-2xl font-bold">
+            ${(calculateTotalSales() - calculateTotalExpenses()).toFixed(2)}
+          </p>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-8">
+        <Card className="p-6">
+          <h3 className="text-xl font-semibold mb-4">Sales Over Time</h3>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={salesData}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#8884d8"
+                  name="Sales"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <h3 className="text-xl font-semibold mb-4">Expenses Over Time</h3>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={expensesData}
+                margin={{
+                  top: 5,
+                  right: 30,
+                  left: 20,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="date" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="total"
+                  stroke="#ff0000"
+                  name="Expenses"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
       </div>
     </div>
   );
-}
+};
+
+export default Statistics;

@@ -140,6 +140,7 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
       title: "Shift Ended",
       description: "Your shift has been successfully ended.",
     });
+    window.location.reload(); // Add page reload
   };
 
   const canEndShift = activeShift && user?.role === 'admin';

@@ -23,10 +23,11 @@ export function PaymentSection({
   const change = cashReceived ? parseFloat(cashReceived) - totalAmount : 0;
 
   const quickAmounts = [
-    totalAmount, // Exact amount
-    Math.ceil(totalAmount / 10) * 10, // Round up to nearest 10
-    Math.ceil(totalAmount / 20) * 20, // Round up to nearest 20
-  ].filter((amount, index) => index === 0 || amount > totalAmount); // Keep first amount (exact) and filter others only if greater than total
+    totalAmount,           // Exact amount
+    totalAmount + 5,       // $5 more
+    totalAmount + 10,      // $10 more
+    totalAmount + 20,      // $20 more
+  ];
 
   return (
     <div className="mt-4 pt-4 border-t border-gray-700">

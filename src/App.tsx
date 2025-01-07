@@ -11,6 +11,7 @@ import Index from "@/pages/Index";
 import Statistics from "@/pages/Statistics";
 import ControlPanel from "@/pages/ControlPanel";
 import SalesHistory from "@/pages/SalesHistory";
+import ExpenseHistory from "@/pages/ExpenseHistory";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,7 @@ const App = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/pos" element={<ProtectedRoute><Pos /></ProtectedRoute>} />
             <Route path="/sales-history" element={<ProtectedRoute><SalesHistory /></ProtectedRoute>} />
+            <Route path="/expense-history" element={<ProtectedRoute><ExpenseHistory /></ProtectedRoute>} />
             <Route path="/statistics" element={<ProtectedRoute><Statistics /></ProtectedRoute>} />
             <Route path="/inventory" element={<ProtectedRoute><Index /></ProtectedRoute>} />
             <Route path="/control-panel" element={<ProtectedRoute><ControlPanel /></ProtectedRoute>} />
