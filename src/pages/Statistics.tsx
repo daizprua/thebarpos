@@ -12,120 +12,178 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
 } from "recharts";
 import { Button } from "@/components/ui/button";
-
-// Mock data - replace with real data when connected to backend
-const dailyData = [
-  { name: "Mon", sales: 4000 },
-  { name: "Tue", sales: 3000 },
-  { name: "Wed", sales: 2000 },
-  { name: "Thu", sales: 2780 },
-  { name: "Fri", sales: 1890 },
-  { name: "Sat", sales: 2390 },
-  { name: "Sun", sales: 3490 },
-];
-
-const weeklyData = [
-  { name: "Week 1", sales: 24000 },
-  { name: "Week 2", sales: 21000 },
-  { name: "Week 3", sales: 18000 },
-  { name: "Week 4", sales: 23490 },
-];
-
-const monthlyData = [
-  { name: "Jan", sales: 94000 },
-  { name: "Feb", sales: 83000 },
-  { name: "Mar", sales: 72000 },
-  { name: "Apr", sales: 86780 },
-  { name: "May", sales: 91890 },
-  { name: "Jun", sales: 82390 },
-];
-
-const yearlyData = [
-  { name: "2021", sales: 940000 },
-  { name: "2022", sales: 1083000 },
-  { name: "2023", sales: 1272000 },
-  { name: "2024", sales: 986780 },
-];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type TimeRange = "daily" | "weekly" | "monthly" | "yearly";
 
 export default function Statistics() {
   const [timeRange, setTimeRange] = useState<TimeRange>("daily");
+  const [activeTab, setActiveTab] = useState("sales");
 
-  const getDataForRange = () => {
-    switch (timeRange) {
-      case "daily":
-        return dailyData;
-      case "weekly":
-        return weeklyData;
-      case "monthly":
-        return monthlyData;
-      case "yearly":
-        return yearlyData;
-    }
+  const getSalesData = () => {
+    const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+    const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+    
+    const groupedData: { [key: string]: { sales: number; expenses: number } } = {};
+    
+    sales.forEach((sale: any) => {
+      const date = new Date(sale.date);
+      let key = '';
+      
+      switch (timeRange) {
+        case 'daily':
+          key = date.toLocaleDateString();
+          break;
+        case 'weekly':
+          const weekNum = Math.ceil((date.getDate() + 6 - date.getDay()) / 7);
+          key = `Week ${weekNum}`;
+          break;
+        case 'monthly':
+          key = date.toLocaleString('default', { month: 'short' });
+          break;
+        case 'yearly':
+          key = date.getFullYear().toString();
+          break;
+      }
+      
+      if (!groupedData[key]) {
+        groupedData[key] = { sales: 0, expenses: 0 };
+      }
+      groupedData[key].sales += sale.total;
+    });
+    
+    expenses.forEach((expense: any) => {
+      const date = new Date(expense.date);
+      let key = '';
+      
+      switch (timeRange) {
+        case 'daily':
+          key = date.toLocaleDateString();
+          break;
+        case 'weekly':
+          const weekNum = Math.ceil((date.getDate() + 6 - date.getDay()) / 7);
+          key = `Week ${weekNum}`;
+          break;
+        case 'monthly':
+          key = date.toLocaleString('default', { month: 'short' });
+          break;
+        case 'yearly':
+          key = date.getFullYear().toString();
+          break;
+      }
+      
+      if (!groupedData[key]) {
+        groupedData[key] = { sales: 0, expenses: 0 };
+      }
+      groupedData[key].expenses += expense.amount;
+    });
+    
+    return Object.entries(groupedData).map(([name, data]) => ({
+      name,
+      sales: data.sales,
+      expenses: data.expenses,
+      net: data.sales - data.expenses,
+    }));
+  };
+
+  const getExpenseHistory = () => {
+    const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+    return expenses.sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime());
   };
 
   return (
     <div className="min-h-screen bg-[#1A1F2C] p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Sales Statistics</h1>
-          <p className="text-gray-400">Track your sales performance over time</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Statistics</h1>
+          <p className="text-gray-400">Track your sales and expenses over time</p>
         </div>
 
-        <div className="flex gap-4">
-          <Button
-            variant={timeRange === "daily" ? "default" : "outline"}
-            onClick={() => setTimeRange("daily")}
-          >
-            Daily
-          </Button>
-          <Button
-            variant={timeRange === "weekly" ? "default" : "outline"}
-            onClick={() => setTimeRange("weekly")}
-          >
-            Weekly
-          </Button>
-          <Button
-            variant={timeRange === "monthly" ? "default" : "outline"}
-            onClick={() => setTimeRange("monthly")}
-          >
-            Monthly
-          </Button>
-          <Button
-            variant={timeRange === "yearly" ? "default" : "outline"}
-            onClick={() => setTimeRange("yearly")}
-          >
-            Yearly
-          </Button>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="sales">Sales & Expenses</TabsTrigger>
+            <TabsTrigger value="expenses">Expense History</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="sales">
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <Button
+                  variant={timeRange === "daily" ? "default" : "outline"}
+                  onClick={() => setTimeRange("daily")}
+                >
+                  Daily
+                </Button>
+                <Button
+                  variant={timeRange === "weekly" ? "default" : "outline"}
+                  onClick={() => setTimeRange("weekly")}
+                >
+                  Weekly
+                </Button>
+                <Button
+                  variant={timeRange === "monthly" ? "default" : "outline"}
+                  onClick={() => setTimeRange("monthly")}
+                >
+                  Monthly
+                </Button>
+                <Button
+                  variant={timeRange === "yearly" ? "default" : "outline"}
+                  onClick={() => setTimeRange("yearly")}
+                >
+                  Yearly
+                </Button>
+              </div>
 
-        <Card className="p-6 backdrop-blur-lg bg-card border-none">
-          <ChartContainer
-            className="h-[400px]"
-            config={{
-              sales: {
-                color: "#9b87f5",
-              },
-            }}
-          >
-            <BarChart data={getDataForRange()} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" stroke="#ffffff" />
-              <YAxis stroke="#ffffff" />
-              <Tooltip content={({ active, payload, label }) => (
-                <ChartTooltipContent
-                  active={active}
-                  payload={payload}
-                  label={label}
-                />
-              )} />
-              <Bar dataKey="sales" fill="var(--color-sales)" />
-            </BarChart>
-          </ChartContainer>
-        </Card>
+              <Card className="p-6 backdrop-blur-lg bg-card border-none">
+                <ChartContainer className="h-[400px]">
+                  <BarChart data={getSalesData()} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" stroke="#ffffff" />
+                    <YAxis stroke="#ffffff" />
+                    <Tooltip content={({ active, payload, label }) => (
+                      <ChartTooltipContent
+                        active={active}
+                        payload={payload}
+                        label={label}
+                      />
+                    )} />
+                    <Legend />
+                    <Bar dataKey="sales" name="Sales" fill="#4ade80" />
+                    <Bar dataKey="expenses" name="Expenses" fill="#ef4444" />
+                    <Bar dataKey="net" name="Net" fill="#60a5fa" />
+                  </BarChart>
+                </ChartContainer>
+              </Card>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="expenses">
+            <Card className="p-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Expense History</h3>
+                <div className="space-y-4">
+                  {getExpenseHistory().map((expense: any) => (
+                    <div key={expense.id} className="flex justify-between items-center p-4 border rounded-lg">
+                      <div>
+                        <p className="font-medium">{expense.description}</p>
+                        <p className="text-sm text-gray-500">
+                          {new Date(expense.date).toLocaleDateString()} {new Date(expense.date).toLocaleTimeString()}
+                        </p>
+                      </div>
+                      <p className="text-red-500 font-semibold">-${expense.amount.toFixed(2)}</p>
+                    </div>
+                  ))}
+                  {getExpenseHistory().length === 0 && (
+                    <p className="text-center text-gray-500">No expenses recorded</p>
+                  )}
+                </div>
+              </div>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

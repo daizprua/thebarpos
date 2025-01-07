@@ -144,6 +144,24 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
 
   const canEndShift = activeShift && user?.role === 'admin';
 
+  const handleDeleteShift = (shiftId: number) => {
+    if (!user?.role === 'admin') return;
+    
+    const updatedShifts = shifts.filter(shift => shift.id !== shiftId);
+    localStorage.setItem('shifts', JSON.stringify(updatedShifts));
+    setShifts(updatedShifts);
+    
+    // Also delete related sales
+    const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
+    const updatedSales = existingSales.filter((sale: any) => sale.shiftId !== shiftId);
+    localStorage.setItem('sales', JSON.stringify(updatedSales));
+    
+    toast({
+      title: "Shift Deleted",
+      description: "The shift and its associated sales have been deleted.",
+    });
+  };
+
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-4">
@@ -277,9 +295,20 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
                     {new Date(shift.startTime).toLocaleDateString()} {" "}
                     {new Date(shift.startTime).toLocaleTimeString()}
                   </span>
-                  <span className="text-muted-foreground">
-                    {shift.endTime ? `Ended: ${new Date(shift.endTime).toLocaleTimeString()}` : "Active"}
-                  </span>
+                  <div className="flex gap-2 items-center">
+                    <span className="text-muted-foreground">
+                      {shift.endTime ? `Ended: ${new Date(shift.endTime).toLocaleTimeString()}` : "Active"}
+                    </span>
+                    {user?.role === 'admin' && shift.endTime && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteShift(shift.id)}
+                      >
+                        Delete
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
