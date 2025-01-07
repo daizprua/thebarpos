@@ -1,10 +1,11 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { InventoryTableRow } from "./InventoryTableRow";
 
 interface InventoryItem {
   id: number;
@@ -13,6 +14,7 @@ interface InventoryItem {
   quantity: number;
   threshold: number;
   price: number;
+  imageUrl?: string;
 }
 
 interface InventoryTableProps {
@@ -118,75 +120,18 @@ export const InventoryTable = ({ items, onDeleteItem, onUpdateItem }: InventoryT
           </TableHeader>
           <TableBody>
             {paginatedItems.map((item) => (
-              <TableRow key={item.id}>
-                {editingId === item.id ? (
-                  <>
-                    <TableCell>
-                      <Input
-                        value={editForm?.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        className="max-w-[200px]"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        value={editForm?.category}
-                        onChange={(e) => handleInputChange('category', e.target.value)}
-                        className="max-w-[150px]"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={editForm?.quantity}
-                        onChange={(e) => handleInputChange('quantity', e.target.value)}
-                        className="max-w-[100px]"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        value={editForm?.price}
-                        onChange={(e) => handleInputChange('price', e.target.value)}
-                        className="max-w-[100px]"
-                      />
-                    </TableCell>
-                    <TableCell>{getStockStatus(item.quantity, item.threshold)}</TableCell>
-                    <TableCell className="space-x-2">
-                      <Button variant="default" size="sm" onClick={handleSave}>
-                        Save
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={handleCancel}>
-                        Cancel
-                      </Button>
-                    </TableCell>
-                  </>
-                ) : (
-                  <>
-                    <TableCell className="font-medium text-white">{item.name}</TableCell>
-                    <TableCell className="text-gray-300">{item.category}</TableCell>
-                    <TableCell className="text-gray-300">{item.quantity}</TableCell>
-                    <TableCell className="text-gray-300">${item.price?.toFixed(2)}</TableCell>
-                    <TableCell>{getStockStatus(item.quantity, item.threshold)}</TableCell>
-                    <TableCell className="space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleEdit(item)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </>
-                )}
-              </TableRow>
+              <InventoryTableRow
+                key={item.id}
+                item={item}
+                editingId={editingId}
+                editForm={editForm}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onSave={handleSave}
+                onCancel={handleCancel}
+                onInputChange={handleInputChange}
+                getStockStatus={getStockStatus}
+              />
             ))}
           </TableBody>
         </Table>
