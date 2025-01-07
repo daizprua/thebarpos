@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Package, Store, BarChart, Home, Settings } from "lucide-react";
+import { Package, Store, BarChart, Home, Settings, LogOut } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -21,6 +21,15 @@ export function ProfessionalMenu() {
         description: "You don't have permission to access this section.",
       });
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    toast({
+      title: "Logged out successfully",
+      description: "You have been logged out of your account.",
+    });
+    window.location.href = '/';
   };
 
   return (
@@ -82,6 +91,15 @@ export function ProfessionalMenu() {
               </Link>
             </Button>
           </div>
+          
+          <Button 
+            variant="ghost" 
+            onClick={handleLogout}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <LogOut className="h-5 w-5 mr-2" />
+            Logout
+          </Button>
         </div>
       </div>
     </nav>
