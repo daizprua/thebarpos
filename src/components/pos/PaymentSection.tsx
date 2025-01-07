@@ -23,10 +23,10 @@ export function PaymentSection({
   const change = cashReceived ? parseFloat(cashReceived) - totalAmount : 0;
 
   const quickAmounts = [
-    Math.ceil(totalAmount / 5) * 5,
-    Math.ceil(totalAmount / 10) * 10,
-    Math.ceil(totalAmount / 20) * 20,
-  ].filter((amount) => amount > totalAmount);
+    totalAmount, // Exact amount
+    Math.ceil(totalAmount / 10) * 10, // Round up to nearest 10
+    Math.ceil(totalAmount / 20) * 20, // Round up to nearest 20
+  ].filter((amount, index) => index === 0 || amount > totalAmount); // Keep first amount (exact) and filter others only if greater than total
 
   return (
     <div className="mt-4 pt-4 border-t border-gray-700">
@@ -79,7 +79,7 @@ export function PaymentSection({
                   onClick={() => setCashReceived(amount.toString())}
                   className="flex-1"
                 >
-                  ${amount}
+                  ${amount.toFixed(2)}
                 </Button>
               ))}
             </div>
