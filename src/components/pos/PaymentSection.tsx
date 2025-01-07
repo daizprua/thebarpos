@@ -34,22 +34,6 @@ export function PaymentSection({
     ? parseFloat(cashReceived) - totalAmount
     : 0;
 
-  // Calculate convenient payment amounts
-  const nextWholeNumber = Math.ceil(totalAmount);
-  const nextTen = Math.ceil(totalAmount / 10) * 10;
-  const nextHigherTen = nextTen + 10;
-
-  const quickPaymentAmounts = [
-    totalAmount,
-    nextWholeNumber,
-    nextTen,
-    nextHigherTen
-  ];
-  
-  const handleQuickPayment = (amount: number) => {
-    setCashReceived(amount.toFixed(2));
-  };
-
   return (
     <div className="mt-6 space-y-4">
       <div className="flex justify-between text-lg font-semibold text-white">
@@ -84,18 +68,6 @@ export function PaymentSection({
 
         {paymentMethod === "efectivo" && (
           <div className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              {quickPaymentAmounts.map((amount) => (
-                <Button
-                  key={amount}
-                  variant="outline"
-                  onClick={() => handleQuickPayment(amount)}
-                  className="w-full"
-                >
-                  ${amount.toFixed(2)}
-                </Button>
-              ))}
-            </div>
             <Input
               type="number"
               placeholder="Cash received"
