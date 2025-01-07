@@ -10,6 +10,7 @@ interface InventoryItem {
   category: string;
   quantity: number;
   threshold: number;
+  price: number;
 }
 
 interface InventoryTableProps {
@@ -44,6 +45,7 @@ export const InventoryTable = ({ items, onDeleteItem }: InventoryTableProps) => 
             <TableHead className="text-gray-400">Name</TableHead>
             <TableHead className="text-gray-400">Category</TableHead>
             <TableHead className="text-gray-400">Quantity</TableHead>
+            <TableHead className="text-gray-400">Price</TableHead>
             <TableHead className="text-gray-400">Status</TableHead>
             <TableHead className="text-gray-400">Actions</TableHead>
           </TableRow>
@@ -54,6 +56,7 @@ export const InventoryTable = ({ items, onDeleteItem }: InventoryTableProps) => 
               <TableCell className="font-medium text-white">{item.name}</TableCell>
               <TableCell className="text-gray-300">{item.category}</TableCell>
               <TableCell className="text-gray-300">{item.quantity}</TableCell>
+              <TableCell className="text-gray-300">${item.price?.toFixed(2)}</TableCell>
               <TableCell>{getStockStatus(item.quantity, item.threshold)}</TableCell>
               <TableCell>
                 <Button

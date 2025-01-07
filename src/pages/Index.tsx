@@ -6,10 +6,10 @@ import { ArticleManager } from "@/components/ArticleManager";
 import { useState } from "react";
 
 const initialInventory = [
-  { id: 1, name: "Grey Goose Vodka", category: "Spirits", quantity: 5, threshold: 10 },
-  { id: 2, name: "Heineken", category: "Beer", quantity: 48, threshold: 24 },
-  { id: 3, name: "Dom Pérignon", category: "Wine", quantity: 3, threshold: 5 },
-  { id: 4, name: "Coca-Cola", category: "Mixers", quantity: 120, threshold: 50 },
+  { id: 1, name: "Grey Goose Vodka", category: "Spirits", quantity: 5, threshold: 10, price: 29.99 },
+  { id: 2, name: "Heineken", category: "Beer", quantity: 48, threshold: 24, price: 2.49 },
+  { id: 3, name: "Dom Pérignon", category: "Wine", quantity: 3, threshold: 5, price: 199.99 },
+  { id: 4, name: "Coca-Cola", category: "Mixers", quantity: 120, threshold: 50, price: 1.99 },
 ];
 
 const Index = () => {
@@ -17,6 +17,10 @@ const Index = () => {
 
   const handleDeleteItem = (id: number) => {
     setInventory(inventory.filter(item => item.id !== id));
+  };
+
+  const calculateTotalValue = () => {
+    return inventory.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   return (
@@ -34,7 +38,7 @@ const Index = () => {
             value={inventory.filter(item => item.quantity <= item.threshold).length.toString()} 
             icon={<ShoppingCart />} 
           />
-          <StatsCard title="Value in Stock" value="$24,590" icon={<DollarSign />} />
+          <StatsCard title="Value in Stock" value={`$${calculateTotalValue().toFixed(2)}`} icon={<DollarSign />} />
           <StatsCard title="Items Sold Today" value="47" icon={<Wine />} />
         </div>
 
