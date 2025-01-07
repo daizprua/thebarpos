@@ -19,25 +19,25 @@ export default {
     },
     extend: {
       colors: {
-        border: "var(--border)",
-        input: "var(--input)",
-        ring: "var(--ring)",
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        border: "#6E59A5",
+        input: "#7E69AB",
+        ring: "#9b87f5",
+        background: "#1A1F2C",
+        foreground: "#FFFFFF",
         primary: {
-          DEFAULT: "var(--primary)",
+          DEFAULT: "#9b87f5",
           foreground: "#ffffff",
         },
         secondary: {
-          DEFAULT: "var(--secondary)",
+          DEFAULT: "#7E69AB",
           foreground: "#ffffff",
         },
         accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "#ffffff",
+          DEFAULT: "#D6BCFA",
+          foreground: "#1A1F2C",
         },
         warning: {
-          DEFAULT: "var(--warning)",
+          DEFAULT: "#F97316",
           foreground: "#ffffff",
         },
         destructive: {
@@ -49,7 +49,7 @@ export default {
           foreground: "hsl(var(--muted-foreground))",
         },
         card: {
-          DEFAULT: "var(--card)",
+          DEFAULT: "rgba(26, 31, 44, 0.8)",
           foreground: "#ffffff",
         },
       },
