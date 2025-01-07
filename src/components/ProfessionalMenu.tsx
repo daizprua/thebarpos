@@ -1,10 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { Package, Store, BarChart, Home, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
 
 export function ProfessionalMenu() {
   const location = useLocation();
   const currentPath = location.pathname;
+  const { toast } = useToast();
+  
+  // Get user from localStorage (set during login)
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+
+  const handleRestrictedAccess = (e: React.MouseEvent) => {
+    if (user?.role === 'cajero') {
+      e.preventDefault();
+      toast({
+        variant: "destructive",
+        title: "Access Denied",
+        description: "You don't have permission to access this section.",
+      });
+    }
+  };
 
   return (
     <nav className="bg-card/50 backdrop-blur-lg border-b border-border/50 sticky top-0 z-50">
@@ -15,6 +32,7 @@ export function ProfessionalMenu() {
               <Link 
                 to="/" 
                 className={`flex items-center gap-2 ${currentPath === "/" ? "text-primary" : ""}`}
+                onClick={handleRestrictedAccess}
               >
                 <Home className="h-5 w-5" />
                 <span>Home</span>
@@ -35,6 +53,7 @@ export function ProfessionalMenu() {
               <Link 
                 to="/statistics" 
                 className={`flex items-center gap-2 ${currentPath === "/statistics" ? "text-primary" : ""}`}
+                onClick={handleRestrictedAccess}
               >
                 <BarChart className="h-5 w-5" />
                 <span>Statistics</span>
@@ -45,6 +64,7 @@ export function ProfessionalMenu() {
               <Link 
                 to="/inventory" 
                 className={`flex items-center gap-2 ${currentPath === "/inventory" ? "text-primary" : ""}`}
+                onClick={handleRestrictedAccess}
               >
                 <Package className="h-5 w-5" />
                 <span>Inventory</span>
@@ -55,6 +75,7 @@ export function ProfessionalMenu() {
               <Link 
                 to="/control-panel" 
                 className={`flex items-center gap-2 ${currentPath === "/control-panel" ? "text-primary" : ""}`}
+                onClick={handleRestrictedAccess}
               >
                 <Settings className="h-5 w-5" />
                 <span>Control Panel</span>
