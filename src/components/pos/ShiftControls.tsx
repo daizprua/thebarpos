@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlayCircle, StopCircle, History, Plus } from "lucide-react";
+import { PlayCircle, StopCircle, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shift, Expense, ShiftSummary } from "@/types/pos";
+import { Expense, ShiftSummary } from "@/types/pos";
 import { ExpenseForm } from "./ExpenseForm";
 import { ShiftSummary as ShiftSummaryComponent } from "./ShiftSummary";
 
@@ -37,36 +37,12 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
   const [showEndShiftDialog, setShowEndShiftDialog] = useState(false);
   const [showConfirmEndDialog, setShowConfirmEndDialog] = useState(false);
   const [initialCash, setInitialCash] = useState("");
-  const [showHistory, setShowHistory] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [shiftSummary, setShiftSummary] = useState<ShiftSummary | null>(null);
   const { toast } = useToast();
   
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
-  
-  const [shifts, setShifts] = useState<Shift[]>(() => {
-    try {
-      const savedShifts = JSON.parse(localStorage.getItem('shifts') || '[]');
-      return Array.isArray(savedShifts) ? savedShifts : [];
-    } catch {
-      return [];
-    }
-  });
-
-  useEffect(() => {
-    const handleStorageChange = () => {
-      try {
-        const savedShifts = JSON.parse(localStorage.getItem('shifts') || '[]');
-        setShifts(Array.isArray(savedShifts) ? savedShifts : []);
-      } catch {
-        setShifts([]);
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
 
   const handleStartShift = () => {
     const amount = parseFloat(initialCash);
@@ -140,29 +116,10 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
       title: "Shift Ended",
       description: "Your shift has been successfully ended.",
     });
-    window.location.reload(); // Add page reload
+    window.location.reload();
   };
 
   const canEndShift = activeShift && user?.role === 'admin';
-
-  const handleDeleteShift = (shiftId: number) => {
-    // Fix the type comparison by checking if role exists and equals 'admin'
-    if (user?.role !== 'admin') return;
-    
-    const updatedShifts = shifts.filter(shift => shift.id !== shiftId);
-    localStorage.setItem('shifts', JSON.stringify(updatedShifts));
-    setShifts(updatedShifts);
-    
-    // Also delete related sales
-    const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
-    const updatedSales = existingSales.filter((sale: any) => sale.shiftId !== shiftId);
-    localStorage.setItem('sales', JSON.stringify(updatedSales));
-    
-    toast({
-      title: "Shift Deleted",
-      description: "The shift and its associated sales have been deleted.",
-    });
-  };
 
   return (
     <div className="flex justify-between items-center">
@@ -274,66 +231,6 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
           </span>
         )}
       </div>
-      
-      <Dialog open={showHistory} onOpenChange={setShowHistory}>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="flex items-center gap-2">
-            <History className="h-4 w-4" />
-            Shift History
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Shift History</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-            {shifts.map((shift) => (
-              <div
-                key={shift.id}
-                className="p-4 rounded-lg border bg-card text-card-foreground"
-              >
-                <div className="flex justify-between mb-2">
-                  <span className="font-medium">
-                    {new Date(shift.startTime).toLocaleDateString()} {" "}
-                    {new Date(shift.startTime).toLocaleTimeString()}
-                  </span>
-                  <div className="flex gap-2 items-center">
-                    <span className="text-muted-foreground">
-                      {shift.endTime ? `Ended: ${new Date(shift.endTime).toLocaleTimeString()}` : "Active"}
-                    </span>
-                    {user?.role === 'admin' && shift.endTime && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteShift(shift.id)}
-                      >
-                        Delete
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-4 text-sm">
-                  <div>
-                    <p className="text-muted-foreground">Initial Cash</p>
-                    <p className="font-medium">${(shift.initialCash || 0).toFixed(2)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Total Sales</p>
-                    <p className="font-medium">${(shift.totalSales || 0).toFixed(2)}</p>
-                  </div>
-                  <div>
-                    <p className="text-muted-foreground">Transactions</p>
-                    <p className="font-medium">{shift.numberOfTransactions || 0}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {shifts.length === 0 && (
-              <p className="text-center text-muted-foreground">No shift history available</p>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

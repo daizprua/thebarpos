@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Package, Store, BarChart, Home, Settings, LogOut, History, Receipt } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { ShiftHistory } from "./ShiftHistory";
 
 export function ProfessionalMenu() {
   const location = useLocation();
@@ -117,6 +118,8 @@ export function ProfessionalMenu() {
                 <span>Control Panel</span>
               </Link>
             </Button>
+
+            <ShiftHistory />
           </div>
           
           <Button 
