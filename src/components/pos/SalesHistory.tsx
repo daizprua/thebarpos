@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import {
   Table,
@@ -17,31 +17,17 @@ import {
 } from "@/components/ui/select";
 import { Sale } from "@/types/pos";
 
-// Mock data - replace with real data when connected to backend
-const mockSales: Sale[] = [
-  {
-    id: 1,
-    items: [
-      { id: 1, name: "Grey Goose Vodka", category: "Spirits", price: 29.99, quantity: 2 },
-      { id: 4, name: "Coca-Cola", category: "Mixers", price: 2.99, quantity: 3 },
-    ],
-    total: 68.95,
-    date: "2024-04-10T15:30:00",
-  },
-  {
-    id: 2,
-    items: [
-      { id: 2, name: "Heineken", category: "Beer", price: 4.99, quantity: 6 },
-    ],
-    total: 29.94,
-    date: "2024-04-09T18:45:00",
-  },
-];
-
 type TimeRange = "day" | "week" | "month";
 
 export function SalesHistory() {
   const [timeRange, setTimeRange] = useState<TimeRange>("day");
+  const [sales, setSales] = useState<Sale[]>([]);
+
+  useEffect(() => {
+    // Load sales from localStorage
+    const savedSales = JSON.parse(localStorage.getItem('sales') || '[]');
+    setSales(savedSales);
+  }, []);
 
   const filterSales = (sales: Sale[], range: TimeRange) => {
     const now = new Date();
@@ -64,7 +50,7 @@ export function SalesHistory() {
     });
   };
 
-  const filteredSales = filterSales(mockSales, timeRange);
+  const filteredSales = filterSales(sales, timeRange);
 
   return (
     <div className="space-y-4">
@@ -92,21 +78,27 @@ export function SalesHistory() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredSales.map((sale) => (
-              <TableRow key={sale.id}>
-                <TableCell>{format(new Date(sale.date), "PPp")}</TableCell>
-                <TableCell>
-                  <ul className="list-disc list-inside">
-                    {sale.items.map((item, index) => (
-                      <li key={index}>
-                        {item.quantity}x {item.name} (${item.price.toFixed(2)} each)
-                      </li>
-                    ))}
-                  </ul>
-                </TableCell>
-                <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
+            {filteredSales.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center">No sales found</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredSales.map((sale) => (
+                <TableRow key={sale.id}>
+                  <TableCell>{format(new Date(sale.date), "PPp")}</TableCell>
+                  <TableCell>
+                    <ul className="list-disc list-inside">
+                      {sale.items.map((item, index) => (
+                        <li key={index}>
+                          {item.quantity}x {item.name} (${item.price.toFixed(2)} each)
+                        </li>
+                      ))}
+                    </ul>
+                  </TableCell>
+                  <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

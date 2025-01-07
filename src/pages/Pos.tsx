@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ProductsSection } from "@/components/pos/ProductsSection";
 import { CartSection } from "@/components/pos/CartSection";
-import { SalesHistory } from "@/components/pos/SalesHistory";
 import { Product, CartItem } from "@/types/pos";
 
 const mockProducts: Product[] = [
@@ -69,6 +68,17 @@ const Pos = () => {
       });
       return;
     }
+
+    // Save the sale to localStorage
+    const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
+    const newSale = {
+      id: Date.now(),
+      items: cart,
+      total: getTotalAmount(),
+      date: new Date().toISOString()
+    };
+    localStorage.setItem('sales', JSON.stringify([...existingSales, newSale]));
+
     toast({
       title: "Order Completed",
       description: `Total Amount: $${getTotalAmount().toFixed(2)}`,
@@ -90,7 +100,6 @@ const Pos = () => {
               handleCheckout={handleCheckout}
             />
           </div>
-          <SalesHistory />
         </div>
       </div>
     </div>
