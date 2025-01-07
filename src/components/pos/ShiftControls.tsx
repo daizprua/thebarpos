@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PlayCircle, StopCircle, History } from "lucide-react";
+import { PlayCircle, StopCircle, History, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Shift } from "@/types/pos";
+import { Shift, Expense, ShiftSummary } from "@/types/pos";
+import { ExpenseForm } from "./ExpenseForm";
+import { ShiftSummary as ShiftSummaryComponent } from "./ShiftSummary";
 
 interface ShiftControlsProps {
   activeShift: { startTime: string; id: number } | null;
@@ -20,8 +23,12 @@ interface ShiftControlsProps {
 
 export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftControlsProps) {
   const [showStartDialog, setShowStartDialog] = useState(false);
+  const [showExpenseDialog, setShowExpenseDialog] = useState(false);
+  const [showEndShiftDialog, setShowEndShiftDialog] = useState(false);
   const [initialCash, setInitialCash] = useState("");
   const [showHistory, setShowHistory] = useState(false);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [shiftSummary, setShiftSummary] = useState<ShiftSummary | null>(null);
   const { toast } = useToast();
   
   const userStr = localStorage.getItem('user');
@@ -61,7 +68,6 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
       return;
     }
     
-    // Store the username of who started the shift
     const shiftData = {
       startTime: new Date().toISOString(),
       id: Date.now(),
@@ -73,6 +79,47 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
     onStartShift(amount);
     setShowStartDialog(false);
     setInitialCash("");
+  };
+
+  const handleAddExpense = (expense: Expense) => {
+    setExpenses([...expenses, expense]);
+    setShowExpenseDialog(false);
+  };
+
+  const calculateShiftSummary = async () => {
+    if (!activeShift) return;
+
+    const sales = JSON.parse(localStorage.getItem('sales') || '[]')
+      .filter((sale: any) => sale.shiftId === activeShift.id);
+
+    const paymentBreakdown = sales.reduce((acc: any, sale: any) => {
+      const method = sale.paymentMethod || 'unknown';
+      acc[method] = (acc[method] || 0) + sale.total;
+      return acc;
+    }, {});
+
+    const totalSales = sales.reduce((acc: number, sale: any) => acc + sale.total, 0);
+    const totalExpenses = expenses.reduce((acc, exp) => acc + exp.amount, 0);
+
+    const summary: ShiftSummary = {
+      totalSales,
+      totalExpenses,
+      netTotal: totalSales - totalExpenses,
+      paymentBreakdown,
+      expenses
+    };
+
+    setShiftSummary(summary);
+    setShowEndShiftDialog(true);
+  };
+
+  const handleEndShiftConfirm = () => {
+    if (shiftSummary) {
+      onEndShift();
+      setShowEndShiftDialog(false);
+      setExpenses([]);
+      setShiftSummary(null);
+    }
   };
 
   const canEndShift = activeShift && user?.role === 'admin';
@@ -91,6 +138,7 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Start New Shift</DialogTitle>
+                <DialogDescription>Enter the initial cash amount to start the shift.</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
@@ -115,20 +163,52 @@ export function ShiftControls({ activeShift, onStartShift, onEndShift }: ShiftCo
           </Dialog>
         ) : (
           <>
-            {canEndShift ? (
-              <Button 
-                onClick={onEndShift}
-                variant="destructive"
-                className="flex items-center gap-2"
-              >
-                <StopCircle className="h-4 w-4" />
-                End Shift
-              </Button>
-            ) : (
-              <span className="text-sm text-muted-foreground">
-                Only admins can end shifts
-              </span>
-            )}
+            <div className="flex gap-4">
+              <Dialog open={showExpenseDialog} onOpenChange={setShowExpenseDialog}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add Expense
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Expense</DialogTitle>
+                    <DialogDescription>Record a new expense for this shift.</DialogDescription>
+                  </DialogHeader>
+                  <ExpenseForm shiftId={activeShift.id} onAddExpense={handleAddExpense} />
+                </DialogContent>
+              </Dialog>
+
+              {canEndShift && (
+                <Button 
+                  onClick={calculateShiftSummary}
+                  variant="destructive"
+                  className="flex items-center gap-2"
+                >
+                  <StopCircle className="h-4 w-4" />
+                  End Shift
+                </Button>
+              )}
+            </div>
+
+            <Dialog open={showEndShiftDialog} onOpenChange={setShowEndShiftDialog}>
+              <DialogContent className="max-w-3xl">
+                <DialogHeader>
+                  <DialogTitle>Shift Summary</DialogTitle>
+                  <DialogDescription>Review the shift summary before ending the shift.</DialogDescription>
+                </DialogHeader>
+                {shiftSummary && <ShiftSummaryComponent summary={shiftSummary} />}
+                <div className="flex justify-end gap-4 mt-6">
+                  <Button variant="outline" onClick={() => setShowEndShiftDialog(false)}>
+                    Cancel
+                  </Button>
+                  <Button variant="destructive" onClick={handleEndShiftConfirm}>
+                    Confirm & End Shift
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </>
         )}
         {activeShift && (

@@ -16,6 +16,15 @@ export interface Sale {
   total: number;
   date: string;
   shiftId: number;
+  paymentMethod: string;
+}
+
+export interface Expense {
+  id: number;
+  description: string;
+  amount: number;
+  shiftId: number;
+  date: string;
 }
 
 export interface Shift {
@@ -26,4 +35,15 @@ export interface Shift {
   totalSales: number;
   numberOfTransactions: number;
   startedBy?: string;
+  expenses?: Expense[];
+}
+
+export interface ShiftSummary {
+  totalSales: number;
+  totalExpenses: number;
+  netTotal: number;
+  paymentBreakdown: {
+    [key: string]: number;
+  };
+  expenses: Expense[];
 }
