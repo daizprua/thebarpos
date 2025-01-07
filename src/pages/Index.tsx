@@ -4,7 +4,7 @@ import { InventoryTable } from "@/components/InventoryTable";
 import { QuickAddForm } from "@/components/QuickAddForm";
 import { ArticleManager } from "@/components/ArticleManager";
 import { ExcelImport } from "@/components/ExcelImport";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface InventoryItem {
   id: number;
@@ -24,16 +24,31 @@ const initialInventory = [
 ];
 
 const Index = () => {
-  const [inventory, setInventory] = useState(initialInventory);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+
+  // Load inventory from localStorage on component mount
+  useEffect(() => {
+    const savedInventory = localStorage.getItem('inventory');
+    if (savedInventory) {
+      setInventory(JSON.parse(savedInventory));
+    } else {
+      setInventory(initialInventory);
+      localStorage.setItem('inventory', JSON.stringify(initialInventory));
+    }
+  }, []);
 
   const handleDeleteItem = (id: number) => {
-    setInventory(inventory.filter(item => item.id !== id));
+    const updatedInventory = inventory.filter(item => item.id !== id);
+    setInventory(updatedInventory);
+    localStorage.setItem('inventory', JSON.stringify(updatedInventory));
   };
 
   const handleUpdateItem = (updatedItem: InventoryItem) => {
-    setInventory(inventory.map(item => 
+    const updatedInventory = inventory.map(item => 
       item.id === updatedItem.id ? updatedItem : item
-    ));
+    );
+    setInventory(updatedInventory);
+    localStorage.setItem('inventory', JSON.stringify(updatedInventory));
   };
 
   const handleAddItem = (newItem: Omit<InventoryItem, 'id' | 'threshold'>) => {
@@ -43,11 +58,15 @@ const Index = () => {
       id: newId,
       threshold: 10, // Default threshold
     };
-    setInventory([...inventory, itemWithDefaults]);
+    const updatedInventory = [...inventory, itemWithDefaults];
+    setInventory(updatedInventory);
+    localStorage.setItem('inventory', JSON.stringify(updatedInventory));
   };
 
   const handleImportItems = (importedItems: typeof initialInventory) => {
-    setInventory([...inventory, ...importedItems]);
+    const updatedInventory = [...inventory, ...importedItems];
+    setInventory(updatedInventory);
+    localStorage.setItem('inventory', JSON.stringify(updatedInventory));
   };
 
   const calculateTotalValue = () => {
