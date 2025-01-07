@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  ResponsiveContainer,
+  Tooltip,
 } from "recharts";
 import { Button } from "@/components/ui/button";
 
@@ -115,9 +115,13 @@ export default function Statistics() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" stroke="#ffffff" />
               <YAxis stroke="#ffffff" />
-              <ChartTooltip>
-                <ChartTooltipContent />
-              </ChartTooltip>
+              <Tooltip content={({ active, payload, label }) => (
+                <ChartTooltipContent
+                  active={active}
+                  payload={payload}
+                  label={label}
+                />
+              )} />
               <Bar dataKey="sales" fill="var(--color-sales)" />
             </BarChart>
           </ChartContainer>
