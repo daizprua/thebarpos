@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { authenticateUser } from "@/lib/auth";
 
 const Login = () => {
@@ -23,12 +23,8 @@ const Login = () => {
         description: `Welcome, ${user.username}!`,
       });
       
-      // Redirect based on role
-      if (user.role === 'cajero') {
-        navigate('/pos');
-      } else if (user.role === 'admin') {
-        navigate('/inventory');
-      }
+      // Force a page reload to update the app state
+      window.location.href = user.role === 'admin' ? '/inventory' : '/pos';
     } else {
       toast({
         variant: "destructive",
