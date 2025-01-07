@@ -12,6 +12,9 @@ export const ExcelImport = ({ onImport }: ExcelImportProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
+  // Predefined categories
+  const existingCategories = ["Spirits", "Beer", "Wine", "Mixers"];
+
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -23,21 +26,42 @@ export const ExcelImport = ({ onImport }: ExcelImportProps) => {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
+      // Track new categories found during import
+      const newCategories = new Set<string>();
+
       // Validate and transform the data
-      const transformedData = jsonData.map((item: any, index) => ({
-        id: Date.now() + index,
-        name: item.name || item.Name || "",
-        category: item.category || item.Category || "",
-        quantity: Number(item.quantity || item.Quantity || 0),
-        threshold: Number(item.threshold || item.Threshold || 5),
-        price: Number(item.price || item.Price || 0),
-      }));
+      const transformedData = jsonData.map((item: any, index) => {
+        const category = item.category || item.Category || "";
+        
+        // If category is not in existing categories, add it to new categories
+        if (category && !existingCategories.includes(category)) {
+          newCategories.add(category);
+        }
+
+        return {
+          id: Date.now() + index,
+          name: item.name || item.Name || "",
+          category: category,
+          quantity: Number(item.quantity || item.Quantity || 0),
+          threshold: Number(item.threshold || item.Threshold || 5),
+          price: Number(item.price || item.Price || 0),
+        };
+      });
 
       onImport(transformedData);
-      toast({
-        title: "Success",
-        description: `Imported ${transformedData.length} items successfully`,
-      });
+
+      // Show success message with new categories if any were found
+      if (newCategories.size > 0) {
+        toast({
+          title: "Success",
+          description: `Imported ${transformedData.length} items successfully. New categories created: ${Array.from(newCategories).join(", ")}`,
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: `Imported ${transformedData.length} items successfully`,
+        });
+      }
     } catch (error) {
       console.error("Error importing Excel file:", error);
       toast({
