@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -8,19 +8,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { CartItem } from "@/types/pos";
+import { CartItem, SavedSale } from "@/types/pos";
 import { useToast } from "@/hooks/use-toast";
 
 interface SaveSaleDialogProps {
   cart: CartItem[];
   total: number;
   onSave: (clientName: string) => void;
+  currentSavedSale?: SavedSale | null;
 }
 
-export function SaveSaleDialog({ cart, total, onSave }: SaveSaleDialogProps) {
+export function SaveSaleDialog({ cart, total, onSave, currentSavedSale }: SaveSaleDialogProps) {
   const [open, setOpen] = useState(false);
   const [clientName, setClientName] = useState("");
   const { toast } = useToast();
+
+  // Set the client name when editing an existing sale
+  useEffect(() => {
+    if (currentSavedSale) {
+      setClientName(currentSavedSale.clientName);
+    }
+  }, [currentSavedSale]);
 
   const handleSave = () => {
     if (!clientName.trim()) {
@@ -33,19 +41,18 @@ export function SaveSaleDialog({ cart, total, onSave }: SaveSaleDialogProps) {
     }
     onSave(clientName);
     setOpen(false);
-    setClientName("");
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" className="w-full">
-          Save for Later
+          {currentSavedSale ? 'Update Sale' : 'Save for Later'}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Save Sale for Later</DialogTitle>
+          <DialogTitle>{currentSavedSale ? 'Update Sale' : 'Save Sale for Later'}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -71,7 +78,7 @@ export function SaveSaleDialog({ cart, total, onSave }: SaveSaleDialogProps) {
             </div>
           </div>
           <Button onClick={handleSave} className="w-full">
-            Save Sale
+            {currentSavedSale ? 'Update Sale' : 'Save Sale'}
           </Button>
         </div>
       </DialogContent>

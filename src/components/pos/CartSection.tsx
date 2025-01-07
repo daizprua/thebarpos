@@ -1,5 +1,5 @@
 import { ShoppingCart } from "lucide-react";
-import { CartItem } from "@/types/pos";
+import { CartItem, SavedSale } from "@/types/pos";
 import { useState } from "react";
 import { CartItemList } from "./CartItemList";
 import { PaymentSection } from "./PaymentSection";
@@ -11,6 +11,7 @@ interface CartSectionProps {
   getTotalAmount: () => number;
   handleCheckout: () => void;
   onSaveSale: (clientName: string) => void;
+  currentSavedSale?: SavedSale | null;
 }
 
 export function CartSection({
@@ -20,6 +21,7 @@ export function CartSection({
   getTotalAmount,
   handleCheckout,
   onSaveSale,
+  currentSavedSale,
 }: CartSectionProps) {
   const [paymentMethod, setPaymentMethod] = useState<string>("efectivo");
   const [currentPage, setCurrentPage] = useState(1);
@@ -65,6 +67,7 @@ export function CartSection({
           handleCheckout={handlePaymentAndCheckout}
           cart={cart}
           onSaveSale={onSaveSale}
+          currentSavedSale={currentSavedSale}
         />
       </div>
     </div>

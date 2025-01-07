@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SaveSaleDialog } from "./SaveSaleDialog";
-import { CartItem } from "@/types/pos";
+import { CartItem, SavedSale } from "@/types/pos";
 
 interface PaymentSectionProps {
   totalAmount: number;
@@ -14,6 +14,7 @@ interface PaymentSectionProps {
   handleCheckout: () => void;
   cart: CartItem[];
   onSaveSale: (clientName: string) => void;
+  currentSavedSale?: SavedSale | null;
 }
 
 export function PaymentSection({
@@ -25,6 +26,7 @@ export function PaymentSection({
   handleCheckout,
   cart,
   onSaveSale,
+  currentSavedSale,
 }: PaymentSectionProps) {
   const change = cashReceived ? parseFloat(cashReceived) - totalAmount : 0;
 
@@ -119,6 +121,7 @@ export function PaymentSection({
             cart={cart}
             total={totalAmount}
             onSave={onSaveSale}
+            currentSavedSale={currentSavedSale}
           />
         )}
       </div>
