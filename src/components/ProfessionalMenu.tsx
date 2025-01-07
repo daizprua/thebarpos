@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Package, Store, BarChart, Home, Settings, LogOut } from "lucide-react";
+import { Package, Store, BarChart, Home, Settings, LogOut, History } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -8,7 +8,6 @@ export function ProfessionalMenu() {
   const currentPath = location.pathname;
   const { toast } = useToast();
   
-  // Get user from localStorage (set during login)
   const userStr = localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
 
@@ -55,6 +54,16 @@ export function ProfessionalMenu() {
               >
                 <Store className="h-5 w-5" />
                 <span>POS</span>
+              </Link>
+            </Button>
+
+            <Button variant="ghost" asChild>
+              <Link 
+                to="/sales-history" 
+                className={`flex items-center gap-2 ${currentPath === "/sales-history" ? "text-primary" : ""}`}
+              >
+                <History className="h-5 w-5" />
+                <span>Sales History</span>
               </Link>
             </Button>
 

@@ -4,6 +4,7 @@ import { Minus, Plus, ShoppingCart, X } from "lucide-react";
 import { CartItem } from "@/types/pos";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import {
   Pagination,
@@ -31,6 +32,7 @@ export function CartSection({
 }: CartSectionProps) {
   const [paymentMethod, setPaymentMethod] = useState<string>("efectivo");
   const [currentPage, setCurrentPage] = useState(1);
+  const [cashReceived, setCashReceived] = useState<string>("");
   const itemsPerPage = 12;
 
   const handlePaymentAndCheckout = () => {
@@ -39,6 +41,9 @@ export function CartSection({
     }
     handleCheckout();
   };
+
+  const totalAmount = getTotalAmount();
+  const change = cashReceived ? parseFloat(cashReceived) - totalAmount : 0;
 
   const totalPages = Math.ceil(cart.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -135,7 +140,7 @@ export function CartSection({
           <div className="flex justify-between mb-4">
             <span className="text-lg font-semibold text-white">Total:</span>
             <span className="text-lg font-bold text-white">
-              ${getTotalAmount().toFixed(2)}
+              ${totalAmount.toFixed(2)}
             </span>
           </div>
 
@@ -161,11 +166,37 @@ export function CartSection({
             </RadioGroup>
           </div>
 
+          {paymentMethod === "efectivo" && (
+            <div className="mb-4 space-y-4">
+              <div>
+                <Label htmlFor="cashReceived" className="text-white">Cash Received</Label>
+                <Input
+                  id="cashReceived"
+                  type="number"
+                  value={cashReceived}
+                  onChange={(e) => setCashReceived(e.target.value)}
+                  placeholder="Enter amount received"
+                  className="mt-1"
+                />
+              </div>
+              {cashReceived && (
+                <div className="p-4 bg-card rounded-lg">
+                  <div className="flex justify-between text-white">
+                    <span>Change:</span>
+                    <span className={change >= 0 ? "text-green-500" : "text-red-500"}>
+                      ${change.toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <Button 
             className="w-full" 
             size="lg" 
             onClick={handlePaymentAndCheckout}
-            disabled={!paymentMethod}
+            disabled={!paymentMethod || (paymentMethod === "efectivo" && (!cashReceived || parseFloat(cashReceived) < totalAmount))}
           >
             Checkout
           </Button>
