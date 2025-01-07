@@ -26,13 +26,23 @@ export function ShiftHistory() {
   const user = userStr ? JSON.parse(userStr) : null;
 
   const getShiftSales = (shiftId: number): Sale[] => {
-    const sales = JSON.parse(localStorage.getItem('sales') || '[]');
-    return sales.filter((sale: Sale) => sale.shiftId === shiftId);
+    try {
+      const sales = JSON.parse(localStorage.getItem('sales') || '[]');
+      return sales.filter((sale: Sale) => sale.shiftId === shiftId);
+    } catch (error) {
+      console.error('Error loading sales:', error);
+      return [];
+    }
   };
 
   const getShiftExpenses = (shiftId: number): Expense[] => {
-    const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
-    return expenses.filter((expense: Expense) => expense.shiftId === shiftId);
+    try {
+      const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+      return expenses.filter((expense: Expense) => expense.shiftId === shiftId);
+    } catch (error) {
+      console.error('Error loading expenses:', error);
+      return [];
+    }
   };
 
   const calculatePaymentBreakdown = (sales: Sale[]) => {
@@ -46,22 +56,35 @@ export function ShiftHistory() {
   const handleDeleteShift = (shiftId: number) => {
     if (user?.role !== 'admin') return;
     
-    const updatedShifts = shifts.filter(shift => shift.id !== shiftId);
-    localStorage.setItem('shifts', JSON.stringify(updatedShifts));
-    setShifts(updatedShifts);
-    
-    const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
-    const updatedSales = existingSales.filter((sale: any) => sale.shiftId !== shiftId);
-    localStorage.setItem('sales', JSON.stringify(updatedSales));
-    
-    toast({
-      title: "Shift Deleted",
-      description: "The shift and its associated sales have been deleted.",
-    });
+    try {
+      const updatedShifts = shifts.filter(shift => shift.id !== shiftId);
+      localStorage.setItem('shifts', JSON.stringify(updatedShifts));
+      setShifts(updatedShifts);
+      
+      const existingSales = JSON.parse(localStorage.getItem('sales') || '[]');
+      const updatedSales = existingSales.filter((sale: any) => sale.shiftId !== shiftId);
+      localStorage.setItem('sales', JSON.stringify(updatedSales));
+
+      const existingExpenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+      const updatedExpenses = existingExpenses.filter((expense: Expense) => expense.shiftId !== shiftId);
+      localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
+      
+      toast({
+        title: "Shift Deleted",
+        description: "The shift and its associated records have been deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting shift:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete shift. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="space-y-6">
       <h1 className="text-3xl font-bold mb-6">Shift History</h1>
       <div className="space-y-6">
         {shifts.map((shift) => {
