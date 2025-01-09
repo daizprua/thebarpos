@@ -15,12 +15,14 @@ export const ProductDisplayRow = ({ item, onEdit, onDelete, getStockStatus }: Pr
     <>
       <td className="p-4">
         <div className="flex items-center gap-2">
-          <ProductImage
-            imageUrl={item.imageUrl}
-            onImageChange={() => {}}
-            onImageRemove={() => {}}
-          />
-          <span className="font-medium text-white">{item.name}</span>
+          <div className="w-10 h-10 flex-shrink-0">
+            <ProductImage
+              imageUrl={item.imageUrl}
+              onImageChange={() => {}}
+              onImageRemove={() => {}}
+            />
+          </div>
+          <span className="font-medium text-white truncate">{item.name}</span>
         </div>
       </td>
       <td className="p-4 text-gray-300">{item.category}</td>
@@ -33,6 +35,7 @@ export const ProductDisplayRow = ({ item, onEdit, onDelete, getStockStatus }: Pr
             variant="outline"
             size="sm"
             onClick={onEdit}
+            className="h-8 w-8 p-0"
           >
             <Pencil className="h-4 w-4" />
           </Button>
@@ -41,11 +44,12 @@ export const ProductDisplayRow = ({ item, onEdit, onDelete, getStockStatus }: Pr
               <Button
                 variant="destructive"
                 size="sm"
+                className="h-8 w-8 p-0"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
-            <AlertDialogContent>
+            <AlertDialogContent className="sm:max-w-[425px]">
               <AlertDialogHeader>
                 <AlertDialogTitle>Delete Item</AlertDialogTitle>
                 <AlertDialogDescription>

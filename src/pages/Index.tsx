@@ -93,14 +93,14 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[#1A1F2C]">
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+      <div className="p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">Bar Inventory Dashboard</h1>
-            <p className="text-gray-400">Manage your inventory and track stock levels</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Bar Inventory Dashboard</h1>
+            <p className="text-sm sm:text-base text-gray-400">Manage your inventory and track stock levels</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <StatsCard title="Total Items" value={inventory.length.toString()} icon={<Package />} />
             <StatsCard 
               title="Low Stock Items" 
@@ -109,15 +109,17 @@ const Index = () => {
             />
           </div>
 
-          <div className="flex justify-between items-center">
-            <QuickAddForm />
-            <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="w-full sm:flex-1">
+              <QuickAddForm />
+            </div>
+            <div className="flex flex-wrap gap-2 w-full sm:w-auto">
               <ExcelImport onImport={handleImportItems} />
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive">Delete All Products</Button>
+                  <Button variant="destructive" className="w-full sm:w-auto">Delete All Products</Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="sm:max-w-[425px]">
                   <AlertDialogHeader>
                     <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                     <AlertDialogDescription>
@@ -137,12 +139,12 @@ const Index = () => {
           </div>
 
           <div>
-            <h2 className="text-xl font-semibold text-white mb-4">Article Management</h2>
+            <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Article Management</h2>
             <ArticleManager onSaveArticle={handleAddItem} />
           </div>
 
-          <div>
-            <h2 className="text-xl font-semibold text-white mb-4">Current Inventory</h2>
+          <div className="overflow-x-auto">
+            <h2 className="text-lg sm:text-xl font-semibold text-white mb-4">Current Inventory</h2>
             <InventoryTable 
               items={inventory} 
               onDeleteItem={handleDeleteItem}

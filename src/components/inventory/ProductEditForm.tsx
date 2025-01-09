@@ -24,7 +24,7 @@ export const ProductEditForm = ({ editForm, onInputChange, onSave, onCancel }: P
           <Input
             value={editForm?.name}
             onChange={(e) => onInputChange('name', e.target.value)}
-            className="max-w-[200px]"
+            className="max-w-[200px] w-full"
           />
         </div>
       </td>
@@ -32,7 +32,7 @@ export const ProductEditForm = ({ editForm, onInputChange, onSave, onCancel }: P
         <Input
           value={editForm?.category}
           onChange={(e) => onInputChange('category', e.target.value)}
-          className="max-w-[150px]"
+          className="max-w-[150px] w-full"
         />
       </td>
       <td className="p-4">
@@ -40,7 +40,7 @@ export const ProductEditForm = ({ editForm, onInputChange, onSave, onCancel }: P
           type="number"
           value={editForm?.quantity}
           onChange={(e) => onInputChange('quantity', e.target.value)}
-          className="max-w-[100px]"
+          className="max-w-[100px] w-full"
         />
       </td>
       <td className="p-4">
@@ -48,19 +48,19 @@ export const ProductEditForm = ({ editForm, onInputChange, onSave, onCancel }: P
           type="number"
           value={editForm?.price}
           onChange={(e) => onInputChange('price', e.target.value)}
-          className="max-w-[100px]"
+          className="max-w-[100px] w-full"
         />
       </td>
       <td className="p-4">
         {editForm && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row items-center gap-2">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="default" size="sm">
+                <Button variant="default" size="sm" className="w-full sm:w-auto">
                   Save
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent>
+              <AlertDialogContent className="sm:max-w-[425px]">
                 <AlertDialogHeader>
                   <AlertDialogTitle>Confirm Save Changes</AlertDialogTitle>
                   <AlertDialogDescription>
@@ -73,7 +73,7 @@ export const ProductEditForm = ({ editForm, onInputChange, onSave, onCancel }: P
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-            <Button variant="outline" size="sm" onClick={onCancel}>
+            <Button variant="outline" size="sm" onClick={onCancel} className="w-full sm:w-auto">
               Cancel
             </Button>
           </div>

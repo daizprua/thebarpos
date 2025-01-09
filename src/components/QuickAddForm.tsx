@@ -8,9 +8,9 @@ export const QuickAddForm = () => {
 
   return (
     <div className="card-base">
-      <h3 className="section-title">Quick Add Inventory</h3>
-      <div className="flex gap-4">
-        <Input placeholder="Item name" className="form-input" />
+      <h3 className="text-lg sm:text-xl font-semibold mb-4">Quick Add Inventory</h3>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <Input placeholder="Item name" className="form-input flex-1" />
         <Select value={category} onValueChange={setCategory}>
           <SelectTrigger className="form-input">
             <SelectValue placeholder="Category" />
@@ -22,8 +22,8 @@ export const QuickAddForm = () => {
             <SelectItem value="mixers">Mixers</SelectItem>
           </SelectContent>
         </Select>
-        <Input type="number" placeholder="Stock" className="form-input" />
-        <Button className="primary-button">Add Item</Button>
+        <Input type="number" placeholder="Stock" className="form-input w-full sm:w-32" />
+        <Button className="primary-button w-full sm:w-auto">Add Item</Button>
       </div>
     </div>
   );

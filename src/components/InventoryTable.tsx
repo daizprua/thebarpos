@@ -102,20 +102,20 @@ export const InventoryTable = ({ items, onDeleteItem, onUpdateItem }: InventoryT
           placeholder="Search products..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
+          className="max-w-sm w-full"
         />
       </div>
       
-      <div className="rounded-lg border bg-card backdrop-blur-lg">
+      <div className="rounded-lg border bg-card backdrop-blur-lg overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="text-gray-400">Name</TableHead>
-              <TableHead className="text-gray-400">Category</TableHead>
-              <TableHead className="text-gray-400">Stock</TableHead>
-              <TableHead className="text-gray-400">Price</TableHead>
-              <TableHead className="text-gray-400">Status</TableHead>
-              <TableHead className="text-gray-400">Actions</TableHead>
+              <TableHead className="text-gray-400 min-w-[200px]">Name</TableHead>
+              <TableHead className="text-gray-400 min-w-[120px]">Category</TableHead>
+              <TableHead className="text-gray-400 min-w-[80px]">Stock</TableHead>
+              <TableHead className="text-gray-400 min-w-[100px]">Price</TableHead>
+              <TableHead className="text-gray-400 min-w-[100px]">Status</TableHead>
+              <TableHead className="text-gray-400 min-w-[120px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -137,27 +137,28 @@ export const InventoryTable = ({ items, onDeleteItem, onUpdateItem }: InventoryT
         </Table>
       </div>
 
-      {/* Pagination Controls */}
-      <div className="flex items-center justify-end space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-          disabled={currentPage === 1}
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <span className="text-sm text-gray-400">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <span className="text-sm text-gray-400 order-2 sm:order-1">
           Page {currentPage} of {totalPages}
         </span>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-          disabled={currentPage === totalPages}
-        >
-          <ChevronRight className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-2 order-1 sm:order-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+            disabled={currentPage === 1}
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+            disabled={currentPage === totalPages}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
