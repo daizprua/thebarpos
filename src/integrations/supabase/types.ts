@@ -69,6 +69,36 @@ export type Database = {
           },
         ]
       }
+      fixed_expenses: {
+        Row: {
+          amount: number
+          created_at: string | null
+          due_date: string | null
+          frequency: string
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          due_date?: string | null
+          frequency: string
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          due_date?: string | null
+          frequency?: string
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       product_categories: {
         Row: {
           created_at: string | null
