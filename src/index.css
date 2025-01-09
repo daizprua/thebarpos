@@ -24,3 +24,37 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .app-container {
+    @apply min-h-screen bg-background p-8;
+  }
+  
+  .content-container {
+    @apply max-w-7xl mx-auto space-y-8;
+  }
+  
+  .card-base {
+    @apply bg-card backdrop-blur-lg border-0 p-6 rounded-lg;
+  }
+  
+  .section-title {
+    @apply text-2xl font-bold text-white mb-6;
+  }
+  
+  .form-input {
+    @apply bg-background/50 text-white border-secondary/30;
+  }
+  
+  .primary-button {
+    @apply bg-primary hover:bg-primary/90 text-white;
+  }
+  
+  .secondary-button {
+    @apply bg-secondary hover:bg-secondary/90 text-white;
+  }
+  
+  .destructive-button {
+    @apply bg-destructive hover:bg-destructive/90 text-white;
+  }
+}

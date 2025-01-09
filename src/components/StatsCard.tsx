@@ -8,7 +8,7 @@ interface StatsCardProps {
 
 export const StatsCard = ({ title, value, icon }: StatsCardProps) => {
   return (
-    <Card className="p-6 backdrop-blur-lg bg-card border-none">
+    <Card className="card-base">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-400">{title}</p>
