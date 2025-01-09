@@ -3,6 +3,7 @@ import { isAdmin } from "@/lib/auth";
 import { UserManagementCard } from "@/components/control-panel/UserManagementCard";
 import { LimitedAccessCard } from "@/components/control-panel/LimitedAccessCard";
 import { MenuOrderCard } from "@/components/control-panel/MenuOrderCard";
+import { DataSyncCard } from "@/components/control-panel/DataSyncCard";
 
 const ControlPanel = () => {
   const userStr = localStorage.getItem('user');
@@ -17,6 +18,7 @@ const ControlPanel = () => {
 
         {isAdmin(user) ? (
           <div className="grid gap-6">
+            <DataSyncCard />
             <UserManagementCard />
             <MenuOrderCard />
           </div>
