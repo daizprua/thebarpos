@@ -31,17 +31,17 @@ export function CartSection({
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("cash");
 
   return (
-    <div className="w-full lg:w-1/3 bg-card/50 backdrop-blur-lg rounded-lg p-6 space-y-6 h-fit">
-      <h2 className="text-2xl font-bold">Cart</h2>
+    <div className="w-full lg:w-1/3 bg-gradient-to-br from-secondary/30 to-accent/20 backdrop-blur-lg rounded-lg p-6 space-y-6 h-fit border border-secondary/20">
+      <h2 className="text-2xl font-bold text-white">Cart</h2>
       <CartItemList
         cart={cart}
         updateQuantity={updateQuantity}
         removeFromCart={removeFromCart}
       />
-      <div className="pt-4 border-t">
+      <div className="pt-4 border-t border-secondary/30">
         <div className="flex justify-between items-center mb-4">
-          <span className="text-lg font-semibold">Total:</span>
-          <span className="text-lg font-bold">${getTotalAmount().toFixed(2)}</span>
+          <span className="text-lg font-semibold text-white">Total:</span>
+          <span className="text-lg font-bold text-white">${getTotalAmount().toFixed(2)}</span>
         </div>
         <div className="space-y-4">
           <PaymentSection
@@ -49,7 +49,7 @@ export function CartSection({
             selectedMethod={selectedPaymentMethod}
           />
           <Button
-            className="w-full"
+            className="w-full bg-accent hover:bg-accent/90 text-white"
             onClick={() => handleCheckout(selectedPaymentMethod)}
             disabled={cart.length === 0}
           >

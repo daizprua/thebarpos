@@ -27,6 +27,48 @@ export type Database = {
         }
         Relationships: []
       }
+      expenses: {
+        Row: {
+          amount: number
+          category_id: string | null
+          created_at: string | null
+          description: string
+          id: string
+          shift_id: string | null
+        }
+        Insert: {
+          amount: number
+          category_id?: string | null
+          created_at?: string | null
+          description: string
+          id?: string
+          shift_id?: string | null
+        }
+        Update: {
+          amount?: number
+          category_id?: string | null
+          created_at?: string | null
+          description?: string
+          id?: string
+          shift_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "expense_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_shift_id_fkey"
+            columns: ["shift_id"]
+            isOneToOne: false
+            referencedRelation: "shifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       product_categories: {
         Row: {
           created_at: string | null
@@ -42,6 +84,149 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category_id: string | null
+          created_at: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          quantity: number
+          threshold: number
+          updated_at: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+          quantity?: number
+          threshold?: number
+          updated_at?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          quantity?: number
+          threshold?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sale_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          price: number
+          product_id: string | null
+          quantity: number
+          sale_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          price: number
+          product_id?: string | null
+          quantity: number
+          sale_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          price?: number
+          product_id?: string | null
+          quantity?: number
+          sale_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sale_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sale_items_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
+        Row: {
+          client_name: string | null
+          created_at: string | null
+          id: string
+          payment_method: string
+          shift_id: string | null
+          total: number
+        }
+        Insert: {
+          client_name?: string | null
+          created_at?: string | null
+          id?: string
+          payment_method: string
+          shift_id?: string | null
+          total: number
+        }
+        Update: {
+          client_name?: string | null
+          created_at?: string | null
+          id?: string
+          payment_method?: string
+          shift_id?: string | null
+          total?: number
+        }
+        Relationships: []
+      }
+      shifts: {
+        Row: {
+          created_at: string | null
+          end_time: string | null
+          final_cash: number | null
+          id: string
+          initial_cash: number
+          start_time: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_time?: string | null
+          final_cash?: number | null
+          id?: string
+          initial_cash: number
+          start_time?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: string | null
+          final_cash?: number | null
+          id?: string
+          initial_cash?: number
+          start_time?: string
+          user_id?: string | null
         }
         Relationships: []
       }

@@ -2,14 +2,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, X } from "lucide-react";
 import { CartItem } from "@/types/pos";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
 
 interface CartItemListProps {
   cart: CartItem[];
@@ -27,7 +19,7 @@ export function CartItemList({
       {cart.map((item) => (
         <div
           key={item.id}
-          className="flex items-start justify-between py-4 border-b border-gray-700"
+          className="flex items-start justify-between py-4 border-b border-secondary/30 group hover:bg-secondary/10 rounded-lg transition-colors duration-200 px-2"
         >
           <div className="flex gap-3 flex-1">
             {item.imageUrl && (
@@ -49,7 +41,7 @@ export function CartItemList({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 border-secondary/30 hover:bg-secondary/20 text-white"
                 onClick={() => updateQuantity(item.id, -1)}
               >
                 <Minus className="h-4 w-4" />
@@ -60,7 +52,7 @@ export function CartItemList({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 border-secondary/30 hover:bg-secondary/20 text-white"
                 onClick={() => updateQuantity(item.id, 1)}
               >
                 <Plus className="h-4 w-4" />
@@ -69,7 +61,7 @@ export function CartItemList({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-red-500 hover:text-red-600"
+              className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity"
               onClick={() => removeFromCart(item.id)}
             >
               <X className="h-4 w-4" />

@@ -28,7 +28,6 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
     product.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Calculate pagination
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = filteredProducts.slice(
@@ -54,13 +53,16 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
           placeholder="Search products..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9 w-full bg-card/50 backdrop-blur-lg border-0"
+          className="pl-9 w-full bg-primary/10 backdrop-blur-lg border-0 text-white placeholder:text-gray-400"
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-4">
         {currentProducts.map((product) => (
-          <Card key={product.id} className="bg-card/50 backdrop-blur-lg border-0">
+          <Card 
+            key={product.id} 
+            className="bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-lg border-0 hover:from-primary/30 hover:to-secondary/30 transition-all duration-300"
+          >
             <CardContent className="p-4">
               <div className="flex flex-col gap-2">
                 {product.imageUrl && (
@@ -73,7 +75,7 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-semibold text-white">{product.name}</h3>
-                    <Badge variant="outline" className="mt-1">
+                    <Badge variant="outline" className="mt-1 bg-primary/20 text-primary-foreground border-primary/30">
                       {product.category}
                     </Badge>
                   </div>
@@ -82,7 +84,7 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
                   </span>
                 </div>
                 <Button
-                  className="w-full mt-2"
+                  className="w-full mt-2 bg-primary hover:bg-primary/90 text-white"
                   onClick={() => addToCart(product)}
                 >
                   Add to Cart
@@ -99,7 +101,7 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                className={`${currentPage === 1 ? "pointer-events-none opacity-50" : ""} text-white`}
               />
             </PaginationItem>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
@@ -107,6 +109,7 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
                 <PaginationLink
                   onClick={() => handlePageChange(page)}
                   isActive={currentPage === page}
+                  className="text-white"
                 >
                   {page}
                 </PaginationLink>
@@ -115,7 +118,7 @@ export function ProductsSection({ products, addToCart }: ProductsSectionProps) {
             <PaginationItem>
               <PaginationNext
                 onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                className={`${currentPage === totalPages ? "pointer-events-none opacity-50" : ""} text-white`}
               />
             </PaginationItem>
           </PaginationContent>
